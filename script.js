@@ -196,3 +196,32 @@ window.addEventListener("resize",()=>{});
     hint.observe(gallerySection);
   }
 })();
+
+
+// ===== BIRTHDAY EDIT PLAYER =====
+(() => {
+  const video = document.getElementById("birthdayVideo");
+  const play = document.getElementById("birthdayPlay");
+  const frame = document.querySelector(".birthday-video-frame");
+  if(!video || !play || !frame) return;
+
+  const sync = () => {
+    const playing = !video.paused && !video.ended;
+    frame.classList.toggle("playing", playing);
+    play.setAttribute("aria-label", playing ? "Pause birthday video" : "Play birthday video");
+    play.querySelector("span").textContent = playing ? "Ⅱ" : "▶";
+  };
+
+  const toggle = (e) => {
+    e?.preventDefault();
+    if(video.paused || video.ended) video.play().catch(() => {});
+    else video.pause();
+  };
+
+  play.addEventListener("click", toggle);
+  video.addEventListener("click", toggle);
+  video.addEventListener("play", sync);
+  video.addEventListener("pause", sync);
+  video.addEventListener("ended", sync);
+  sync();
+})();
