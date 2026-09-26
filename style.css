@@ -37,3 +37,45 @@ body{isolation:isolate}
 .birthday-video-caption .caption-signoff{color:#d6c9d2;margin-top:14px}
 .birthday-video-caption em{color:#efabc9}
 @media(max-width:649px){.birthday-video-shell{padding:8px;border-radius:23px}.birthday-video-frame,.birthday-video-frame:after{border-radius:17px}.birthday-play{width:62px;height:62px}.birthday-video-caption{padding:18px 8px 9px}.birthday-video-caption h3{font-size:28px}.video-corner{font-size:6.5px}}
+
+
+/* ===== SOFT-LAUNCH MESSAGE + REPLY ===== */
+.soft-modal{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s ease,visibility .35s ease}
+.soft-modal.open{opacity:1;visibility:visible;pointer-events:auto}
+.soft-modal-backdrop{position:absolute;inset:0;background:rgba(4,3,9,.86);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.soft-modal-card{position:relative;width:min(100%,560px);max-height:90svh;overflow:auto;padding:28px 21px 22px;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:linear-gradient(180deg,rgba(30,23,36,.96),rgba(12,9,17,.98));box-shadow:0 35px 100px rgba(0,0,0,.55);transform:translateY(25px) scale(.96);transition:transform .5s var(--ease);z-index:1}
+.soft-modal.open .soft-modal-card{transform:none}
+.soft-modal-close{position:absolute;top:12px;right:12px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:23px;cursor:pointer}
+.soft-modal-card h2{font:600 clamp(38px,9vw,58px)/.93 "Cormorant Garamond",serif;margin:8px 35px 20px 0}
+.soft-chat{display:flex;flex-direction:column;gap:9px}
+.soft-bubble{max-width:86%;padding:11px 13px;border-radius:16px;font-size:12px;line-height:1.5;background:#211b27;color:#ddd3da;border:1px solid rgba(255,255,255,.06)}
+.soft-bubble.me{align-self:flex-end;background:#6d4e76;color:#fff}
+.soft-bubble.highlight{background:linear-gradient(135deg,rgba(242,169,202,.18),rgba(185,140,230,.16));border-color:rgba(242,169,202,.25);font-weight:700;color:#fff}
+.soft-note{font-size:11px;line-height:1.7;color:#a9a0ad;margin:18px 0}
+.soft-modal-actions{display:flex;gap:9px;flex-wrap:wrap}
+.ghost-btn{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:14px 18px;background:rgba(255,255,255,.04);color:#ddd4dd;font-weight:600;cursor:pointer}
+.soft-launch-card{padding:32px 24px;text-align:center;position:relative;overflow:hidden}
+.soft-launch-card:before{content:"";position:absolute;inset:auto -20% -55% -20%;height:180px;background:radial-gradient(circle,rgba(242,169,202,.11),transparent 65%);pointer-events:none}
+.soft-launch-icon{font-size:46px;margin-bottom:4px}
+.soft-launch-card h2{max-width:650px;margin:8px auto 14px}
+.soft-launch-card>p:not(.tiny){max-width:620px;margin:0 auto 22px;color:#aaa1ad;font-size:13px;line-height:1.75}
+.reply-wrap{padding:28px 20px}
+.reply-wrap h2{margin-top:7px}
+.reply-form{margin-top:22px;display:grid;gap:18px}
+.form-row{display:grid;gap:8px;position:relative}
+.form-row label{font-size:11px;color:#e0d6df;font-weight:600}
+.form-row label span{color:#827786;font-weight:400}
+.reply-form input,.reply-form select,.reply-form textarea{width:100%;border:1px solid rgba(255,255,255,.11);border-radius:14px;background:#121019;color:#f1ebef;padding:13px 14px;font:500 13px "DM Sans",sans-serif;outline:none;transition:border-color .25s ease,box-shadow .25s ease,background .25s ease}
+.reply-form textarea{resize:vertical;min-height:140px}
+.reply-form input:focus,.reply-form select:focus,.reply-form textarea:focus{border-color:rgba(242,169,202,.55);box-shadow:0 0 0 3px rgba(242,169,202,.08);background:#15111c}
+.char-count{justify-self:end;margin-top:-3px;font-size:9px;color:#746c78}
+.reply-submit{width:100%;margin-top:3px}
+.reply-consent{font-size:9px;line-height:1.6;color:#746c78}
+.reply-consent code{color:#c39db4}
+.reply-status{min-height:20px;text-align:center;font-size:11px;color:#cf9eb7;margin:0}
+.reply-status.success{color:#9dd7bb}
+.reply-status.error{color:#de9bad}
+.reply-iframe{display:none;width:0;height:0;border:0}
+.honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+@media(min-width:650px){.reply-wrap{padding:34px 30px}.soft-modal-card{padding:34px 28px}.soft-modal-actions{justify-content:center}}
+@media(max-width:520px){.soft-modal{padding:10px}.soft-modal-card{border-radius:23px;padding:25px 17px 18px}.soft-modal-card h2{font-size:40px}.soft-modal-actions{flex-direction:column}.soft-modal-actions .primary-btn,.soft-modal-actions .ghost-btn{width:100%}.soft-launch-card{padding:28px 18px}.reply-wrap{padding:25px 16px}}
