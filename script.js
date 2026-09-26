@@ -178,7 +178,8 @@ function launchConfetti(){
  const loader=$('#pageLoader'),progress=$('#readingProgress'),backTop=$('#backTop'),toast=$('#toast');
  const lightbox=$('#lightbox'),lightboxImage=$('#lightboxImage'),lightboxTitle=$('#lightboxTitle'),lightboxText=$('#lightboxText'),lightboxIndex=$('#lightboxIndex');
  const close=$('#lightboxClose'),prev=$('#lightboxPrev'),next=$('#lightboxNext');
- let gallery=[],current=0,toastTimer;
+ let gallery=[],current=0,toastTimer=0;
+
  addEventListener('load',()=>window.setTimeout(()=>loader?.classList.add('hidden'),180),{once:true});
  let scrollTick=false;
  const updateScrollUI=()=>{
@@ -188,30 +189,150 @@ function launchConfetti(){
    scrollTick=false;
  };
  addEventListener('scroll',()=>{if(!scrollTick){requestAnimationFrame(updateScrollUI);scrollTick=true;}},{passive:true});
- updateScrollUI(); backTop?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
+ updateScrollUI();
+ backTop?.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
+
  const revealItems=document.querySelectorAll('[data-reveal]');
  if('IntersectionObserver' in window){
-   const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('revealed');io.unobserve(e.target);}}),{threshold:.12,rootMargin:'0px 0px -35px 0px'});
+   const io=new IntersectionObserver(entries=>entries.forEach(e=>{
+     if(e.isIntersecting){e.target.classList.add('revealed');io.unobserve(e.target);}
+   }),{threshold:.12,rootMargin:'0px 0px -35px 0px'});
    revealItems.forEach(el=>io.observe(el));
  }else revealItems.forEach(el=>el.classList.add('revealed'));
- const images=[...document.querySelectorAll('.photo-card img,.place-card img,.final-photo')];
- gallery=images.map((img,i)=>{
-   const card=img.closest('figure,.place-card,.celebration-content');
-   const title=card?.querySelector('figcaption b')?.textContent?.trim()||(img.closest('.place-card')?'Favourite place':'Shejal');
-   const fallback=card?.querySelector('figcaption span')?.textContent?.trim()||img.dataset.caption||img.alt;
-   img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
-   return {img,src:img.currentSrc||img.src,alt:img.alt,title,text:fallback};
+
+ /* ----- Gallery / memory viewer ----- */
+ const imageNodes=[...document.querySelectorAll('.photo-card img,.place-card img,.final-photo')];
+ gallery=imageNodes.map((img)=>{
+   const card=img.closest('.photo-card,.place-card,.celebration-content');
+   const title=card?.querySelector('figcaption b')?.textContent?.trim()
+     ||(img.closest('.place-card')?'Favourite place':'Shejal');
+   const text=card?.querySelector('figcaption span')?.textContent?.trim()
+     ||img.dataset.caption||img.alt||'';
+   const src=img.getAttribute('src')||img.currentSrc||'';
+   img.dataset.memoryIndex=String(gallery.length);
+   img.setAttribute('tabindex','0');
+   img.setAttribute('role','button');
+   img.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
+   const owner=img.closest('.photo-card,.place-card,.celebration-content');
+   if(owner){
+     owner.dataset.memoryIndex=String(gallery.length);
+     owner.setAttribute('tabindex','0');
+     owner.setAttribute('role','button');
+     owner.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
+   }
+   return {img,src,alt:img.alt||'Shejal',title,text};
  });
- function preload(index){if(!gallery.length)return;const item=gallery[(index+gallery.length)%gallery.length];const probe=new Image();probe.src=item.src;}
- function show(index){if(!gallery.length)return;current=(index+gallery.length)%gallery.length;const item=gallery[current];lightboxImage.classList.remove('loaded');lightboxImage.src=item.src;lightboxImage.alt=item.alt;lightboxTitle.textContent=item.title;lightboxText.textContent=item.text;lightboxIndex.textContent=`Photo ${current+1} of ${gallery.length}`;prev.disabled=gallery.length<2;next.disabled=gallery.length<2;lightbox.classList.add('open');lightbox.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';preload(current+1);preload(current-1);}
+
+ const setViewerOpen=(open)=>{
+   if(!lightbox) return;
+   lightbox.classList.toggle('open',open);
+   lightbox.setAttribute('aria-hidden',open?'false':'true');
+   document.body.classList.toggle('lightbox-active',open);
+   document.body.style.overflow=open?'hidden':'';
+ };
+
+ function preload(index){
+   if(!gallery.length) return;
+   const item=gallery[(index+gallery.length)%gallery.length];
+   if(!item?.src) return;
+   const probe=new Image();
+   probe.decoding='async';
+   probe.src=item.src;
+ }
+
+ function show(index){
+   if(!gallery.length || !lightbox || !lightboxImage) return;
+   current=(index+gallery.length)%gallery.length;
+   const item=gallery[current];
+   lightboxImage.classList.remove('loaded');
+   lightboxImage.alt=item.alt;
+   lightboxImage.src=item.src;
+   if(lightboxTitle) lightboxTitle.textContent=item.title;
+   if(lightboxText) lightboxText.textContent=item.text;
+   if(lightboxIndex) lightboxIndex.textContent=`Photo ${current+1} of ${gallery.length}`;
+   if(prev) prev.disabled=gallery.length<2;
+   if(next) next.disabled=gallery.length<2;
+   setViewerOpen(true);
+   preload(current+1);
+   preload(current-1);
+ }
+
+ function hide(){
+   if(!lightbox) return;
+   setViewerOpen(false);
+   window.setTimeout(()=>{
+     if(!lightbox.classList.contains('open') && lightboxImage){
+       lightboxImage.src='';
+       lightboxImage.classList.remove('loaded');
+     }
+   },220);
+ }
+
  lightboxImage?.addEventListener('load',()=>lightboxImage.classList.add('loaded'));
- function hide(){lightbox.classList.remove('open');lightbox.setAttribute('aria-hidden','true');document.body.style.overflow='';window.setTimeout(()=>{if(!lightbox.classList.contains('open')){lightboxImage.src='';lightboxImage.classList.remove('loaded');}},300);}
- gallery.forEach((item,i)=>{const img=item.img;const card=img.closest('.photo-card,.place-card,.celebration-content');const open=()=>show(i);card?.addEventListener('click',open);img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});if(card){card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));card.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target===card){e.preventDefault();open();}});}});
- close?.addEventListener('click',hide);prev?.addEventListener('click',e=>{e.stopPropagation();show(current-1)});next?.addEventListener('click',e=>{e.stopPropagation();show(current+1)});lightbox?.addEventListener('click',e=>{if(e.target===lightbox)hide();});
- addEventListener('keydown',e=>{if(!lightbox?.classList.contains('open'))return;if(e.key==='Escape')hide();if(e.key==='ArrowLeft')show(current-1);if(e.key==='ArrowRight')show(current+1);});
- let touchX=0;lightbox?.addEventListener('touchstart',e=>{touchX=e.changedTouches[0].clientX;},{passive:true});lightbox?.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchX;if(Math.abs(dx)>50)show(current+(dx<0?1:-1));},{passive:true});
+
+ /* Delegation is intentional: clicks anywhere inside the card, including its caption and overlay,
+    resolve to the same photo. This avoids fragile per-element hit-testing on transformed cards. */
+ const openFromTarget=(target)=>{
+   if(!(target instanceof Element)) return false;
+   const owner=target.closest('.photo-card,.place-card,.celebration-content');
+   if(!owner) return false;
+   const img=owner.querySelector('img[data-memory-index]');
+   if(!img) return false;
+   const idx=Number(img.dataset.memoryIndex);
+   if(Number.isNaN(idx)) return false;
+   show(idx);
+   return true;
+ };
+
+ document.addEventListener('click',(e)=>{
+   if(lightbox?.classList.contains('open')) return;
+   openFromTarget(e.target);
+ },true);
+
+ document.addEventListener('keydown',(e)=>{
+   if(lightbox?.classList.contains('open')){
+     if(e.key==='Escape'){e.preventDefault();hide();}
+     else if(e.key==='ArrowLeft'){e.preventDefault();show(current-1);}
+     else if(e.key==='ArrowRight'){e.preventDefault();show(current+1);}
+     return;
+   }
+   if(e.key==='Enter'||e.key===' '){
+     const active=document.activeElement;
+     if(active?.matches('.photo-card,.place-card,.celebration-content')){
+       e.preventDefault();
+       openFromTarget(active);
+     }
+   }
+ });
+
+ close?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();hide();});
+ prev?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();show(current-1);});
+ next?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();show(current+1);});
+ lightbox?.addEventListener('click',e=>{if(e.target===lightbox) hide();});
+
+ let touchX=0;
+ lightbox?.addEventListener('touchstart',e=>{touchX=e.changedTouches[0]?.clientX||0;},{passive:true});
+ lightbox?.addEventListener('touchend',e=>{
+   if(!lightbox.classList.contains('open')) return;
+   const dx=(e.changedTouches[0]?.clientX||0)-touchX;
+   if(Math.abs(dx)>50) show(current+(dx<0?1:-1));
+ },{passive:true});
+
  const gallerySection=$('#photos');
- if(gallerySection&&'IntersectionObserver'in window){const hint=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){toast.textContent='Tap a photo to open it ✨';toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2600);hint.disconnect();}},{threshold:.3});hint.observe(gallerySection);}
+ if(gallerySection&&'IntersectionObserver' in window){
+   const hint=new IntersectionObserver(entries=>{
+     if(entries[0].isIntersecting){
+       if(toast){
+         toast.textContent='Tap any photo to open it ✨';
+         toast.classList.add('show');
+         clearTimeout(toastTimer);
+         toastTimer=setTimeout(()=>toast.classList.remove('show'),2600);
+       }
+       hint.disconnect();
+     }
+   },{threshold:.3});
+   hint.observe(gallerySection);
+ }
 })();
 
 /* ===== LAZY VIDEO LOADING ===== */
