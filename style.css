@@ -61,3 +61,8 @@ main,.journey-bar{position:relative;z-index:2}
 .photo-card,.place-card,.celebration-content{cursor:zoom-in;touch-action:manipulation}
 .lightbox{touch-action:pan-y}
 body.lightbox-active{overflow:hidden}
+
+/* Mobile gallery cleanup: keep the card itself clickable, but hide the decorative expand arrow. */
+@media (max-width:640px){
+  .photo-card:before{display:none!important}
+}
