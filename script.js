@@ -370,8 +370,8 @@ function launchConfetti(){
  const recordBtn=$('#voiceRecordBtn'),recordText=$('#voiceRecordText'),timerEl=$('#voiceTimer'),stateEl=$('#voiceState');
  const previewWrap=$('#voicePreviewWrap'),preview=$('#voicePreview'),playBtn=$('#voicePlayBtn'),previewMeta=$('#voicePreviewMeta'),clearBtn=$('#voiceClearBtn'),fileInput=$('#voiceNoteFile'),voiceStatus=$('#voiceNoteStatus');
  let recorder=null,stream=null,chunks=[],startedAt=0,timerId=null,audioUrl='';
- const MAX_RECORDING_MS=8*60*1000;
- const MAX_VOICE_FILE_BYTES=9*1024*1024;
+ const MAX_RECORDING_MS=4*60*1000;
+ const MAX_VOICE_FILE_BYTES=15*1024*1024;
  const formatTime=ms=>{const total=Math.floor(Math.max(0,ms)/1000);return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0');};
  const setVoiceStatus=(msg,type='')=>{if(voiceStatus){voiceStatus.textContent=msg;voiceStatus.className='voice-note-status'+(type?' '+type:'');}};
  const supportedMime=()=>{
@@ -410,7 +410,7 @@ function launchConfetti(){
  const attachBlob=blob=>{
    if(!fileInput||!blob)return false;
    if(blob.size>MAX_VOICE_FILE_BYTES){
-     setVoiceStatus(`Voice note is ${Math.round(blob.size/1024/1024*10)/10} MB. Please keep it under 9 MB.`,'error');
+     setVoiceStatus(`Voice note is ${Math.round(blob.size/1024/1024*10)/10} MB. Please keep it under 15 MB.`,'error');
      return false;
    }
    const mime=blob.type||'audio/webm';
@@ -502,7 +502,7 @@ function launchConfetti(){
        const elapsed=performance.now()-sessionStartedAt;
        if(timerEl)timerEl.textContent=formatTime(elapsed);
        if(elapsed>=MAX_RECORDING_MS){
-         if(stateEl)stateEl.textContent='Eight minutes reached. Finishing your note…';
+         if(stateEl)stateEl.textContent='Four minutes reached. Finishing your note…';
          finishRecording();
        }
      },250);

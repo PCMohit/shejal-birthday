@@ -13,6 +13,6 @@ The website records a voice note in the browser and attaches it to the reply for
 - The voice note is **required** before the reply can be sent.
 - After recording, a playable preview appears so she can listen before submission.
 - A note can be recorded again before sending.
-- Maximum recording time is 8 minutes.
-- The page targets voice-note files below 9 MB.
+- Maximum recording time is 4 minutes.
+- The page targets voice-note files below 15 MB.
 - FormSubmit's current documented limit is **10 MB total across all uploaded files in one form submission**. That server-side limit cannot be increased from the website code alone.
