@@ -356,7 +356,7 @@ function launchConfetti(){
  }
 })();
 
-/* ===== REPLY FORM ===== */
+/* ===== REPLY FORM + VOICE NOTE ===== */
 (()=>{
  const form=$('#replyForm'),status=$('#replyStatus'),submit=$('#replySubmit'),count=$('#charCount'),extra=$('#extraMessage');
  if(!form)return;
@@ -364,6 +364,121 @@ function launchConfetti(){
  const updateCount=()=>{if(count&&extra)count.textContent=extra.value.length;};
  extra?.addEventListener('input',updateCount);updateCount();
  syncQuizMeta();
+
+ // Voice recorder state
+ const recordBtn=$('#voiceRecordBtn'),recordText=$('#voiceRecordText'),timerEl=$('#voiceTimer'),stateEl=$('#voiceState');
+ const previewWrap=$('#voicePreviewWrap'),preview=$('#voicePreview'),clearBtn=$('#voiceClearBtn'),fileInput=$('#voiceNoteFile'),voiceStatus=$('#voiceNoteStatus');
+ let recorder=null,stream=null,chunks=[],startedAt=0,timerId=null,audioUrl='';
+ const MAX_RECORDING_MS=3*60*1000;
+ const formatTime=ms=>{const total=Math.floor(ms/1000);return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0');};
+ const setVoiceStatus=(msg,type='')=>{if(voiceStatus){voiceStatus.textContent=msg;voiceStatus.className='voice-note-status'+(type?' '+type:'');}};
+ const supportedMime=()=>{
+   if(!window.MediaRecorder)return '';
+   const types=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];
+   return types.find(t=>MediaRecorder.isTypeSupported?.(t))||'';
+ };
+ const extForMime=mime=>mime.includes('mp4')?'m4a':mime.includes('ogg')?'ogg':'webm';
+ const stopTracks=()=>{stream?.getTracks().forEach(t=>t.stop());stream=null;};
+ const resetTimer=()=>{if(timerId)clearInterval(timerId);timerId=null;startedAt=0;if(timerEl)timerEl.textContent='00:00';};
+ const removeRecordedFile=()=>{
+   if(fileInput)fileInput.value='';
+   if(preview){preview.pause();preview.removeAttribute('src');preview.load();}
+   if(audioUrl){URL.revokeObjectURL(audioUrl);audioUrl='';}
+   if(previewWrap)previewWrap.hidden=true;
+ };
+ const clearVoice=()=>{
+   if(recorder && recorder.state!=='inactive') recorder.stop();
+   stopTracks();recorder=null;chunks=[];resetTimer();removeRecordedFile();
+   if(recordBtn){recordBtn.classList.remove('recording');recordBtn.setAttribute('aria-pressed','false');recordText.textContent='Start recording';}
+   if(stateEl)stateEl.textContent='Ready when you are.';
+   setVoiceStatus('');
+ };
+ const attachBlob=blob=>{
+   if(!fileInput||!blob)return false;
+   const mime=blob.type||'audio/webm';
+   const file=new File([blob],`shejal-voice-note-${Date.now()}.${extForMime(mime)}`,{type:mime,lastModified:Date.now()});
+   try{
+     const dt=new DataTransfer();dt.items.add(file);fileInput.files=dt.files;
+     return fileInput.files.length===1;
+   }catch(err){
+     setVoiceStatus('Your browser recorded the note, but could not attach it to the form. Please try a newer browser.','error');
+     return false;
+   }
+ };
+ const finishRecording=()=>{
+   if(!recorder)return;
+   const current=recorder;
+   try{current.stop();}catch(_){return;}
+   current.onstop=null;
+   stopTracks();
+   if(timerId)clearInterval(timerId);timerId=null;
+   if(recordBtn){recordBtn.classList.remove('recording');recordBtn.setAttribute('aria-pressed','false');}
+   if(recordText)recordText.textContent='Record again';
+   if(stateEl)stateEl.textContent='Voice note ready. Listen once, then send it with your reply.';
+ };
+ const startRecording=async()=>{
+   if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder){setVoiceStatus('Voice recording is not supported by this browser. Try Chrome, Edge, Safari, or Firefox.','error');return;}
+   if(recorder && recorder.state==='recording'){finishRecording();return;}
+   try{
+     clearVoice();
+     const audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+     stream=audioStream;chunks=[];
+     const mime=supportedMime();
+     recorder=mime?new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:64000}):new MediaRecorder(stream);
+     startedAt=performance.now();
+     recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+     recorder.onerror=()=>setVoiceStatus('Something interrupted the recording. Please try again.','error');
+     recorder.onstop=()=>{
+       const mimeType=recorder?.mimeType||mime||'audio/webm';
+       const blob=new Blob(chunks,{type:mimeType});
+       chunks=[];
+       if(blob.size<1000){setVoiceStatus('That recording was too short. Please record a little longer.','error');return;}
+       const attached=attachBlob(blob);
+       if(!attached)return;
+       audioUrl=URL.createObjectURL(blob);
+       if(preview){preview.src=audioUrl;preview.load();}
+       if(previewWrap)previewWrap.hidden=false;
+       const duration=Math.max(1,Math.round((performance.now()-startedAt)/1000));
+       setVoiceStatus(`Voice note attached · ${formatTime(duration*1000)}`,'success');
+     };
+     recorder.start(250);
+     if(recordBtn){recordBtn.classList.add('recording');recordBtn.setAttribute('aria-pressed','true');}
+     if(recordText)recordText.textContent='Stop recording';
+     if(stateEl)stateEl.textContent='Recording… say whatever you want. ❤️';
+     resetTimer();startedAt=performance.now();
+     timerId=setInterval(()=>{
+       const elapsed=performance.now()-startedAt;
+       if(timerEl)timerEl.textContent=formatTime(elapsed);
+       if(elapsed>=MAX_RECORDING_MS){
+         if(stateEl)stateEl.textContent='Three minutes reached. Finishing your note…';
+         finishRecording();
+       }
+     },250);
+     setVoiceStatus('Microphone active. Your browser may show a recording indicator.');
+   }catch(err){
+     stopTracks();recorder=null;resetTimer();
+     setVoiceStatus(err?.name==='NotAllowedError'?'Microphone permission was denied. Allow microphone access and try again.':'Could not start the microphone. Please try again.','error');
+   }
+ };
+ recordBtn?.addEventListener('click',startRecording);
+ clearBtn?.addEventListener('click',()=>{clearVoice();recordBtn?.focus();});
+
+ // Submit the native multipart form to FormSubmit so the recorded audio is emailed as an attachment.
+ const iframe=$('#replySubmitFrame');
+ let submissionPending=false, submissionTimer=null;
+ iframe?.addEventListener('load',()=>{
+   if(!submissionPending)return;
+   submissionPending=false;
+   if(submissionTimer)clearTimeout(submissionTimer);
+   status.textContent='Your reply and voice note were sent. ❤️';
+   status.className='reply-status success';
+   submit.disabled=false;
+   submit.textContent='Send my reply 💌';
+   clearVoice();
+   form.reset();
+   updateCount();
+   syncQuizMeta();
+ });
  form.addEventListener('submit',e=>{
    if(!SITE_CONFIG.replyEndpoint){e.preventDefault();status.textContent='Reply service is not configured yet. Replace the endpoint in config.js with your FormSubmit URL.';status.className='reply-status error';return;}
    const required=[...form.querySelectorAll('[required]')];
@@ -371,18 +486,21 @@ function launchConfetti(){
    if(missing){e.preventDefault();missing.focus();status.textContent='Please answer both questions before sending. ❤️';status.className='reply-status error';return;}
    if(form.querySelector('input[name="_honey"]')?.value){e.preventDefault();return;}
    syncQuizMeta();
-   submit.disabled=true;submit.textContent='Sending…';status.textContent='Sending your reply…';status.className='reply-status';
-   // FormSubmit posts into a hidden iframe, so keep the page in place.
-   window.setTimeout(()=>{
-     status.textContent='Your reply was sent. Thank you for being honest. ❤️';
-     status.className='reply-status success';
-     submit.disabled=false;
-     submit.textContent='Send my reply 💌';
-     form.reset();
-     updateCount();
-     syncQuizMeta();
-   },1600);
+   if(recorder && recorder.state==='recording'){
+     e.preventDefault();
+     setVoiceStatus('Stop the recording before sending so I can attach the full voice note.','error');
+     recordBtn?.focus();
+     return;
+   }
+   submissionPending=true;
+   submit.disabled=true;submit.textContent='Sending…';status.textContent='Sending your reply'+(fileInput?.files?.length?' and voice note…':'…');status.className='reply-status';
+   submissionTimer=window.setTimeout(()=>{
+     if(!submissionPending)return;
+     status.textContent='Still sending… please keep this page open for a moment.';
+     status.className='reply-status';
+   },7000);
  });
+ window.addEventListener('beforeunload',stopTracks);
 })();
 
 

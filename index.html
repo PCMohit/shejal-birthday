@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260927-gallery-final-index-fix">
+  <link rel="stylesheet" href="style.css?v=20260927-voice-note">
   <link rel="icon" href="assets/photo-11.webp" type="image/webp">
 </head>
 <body>
@@ -272,11 +272,35 @@
         <h2>Okay, now I actually want your answer.</h2>
         <p class="section-intro">Tell me what you thought about the website, what you thought about my little soft launch, and anything else you want to say. No disappearing answers. 😌</p>
 
-        <form id="replyForm" class="reply-form" method="POST" target="replySubmitFrame" novalidate>
+        <form id="replyForm" class="reply-form" method="POST" target="replySubmitFrame" enctype="multipart/form-data" novalidate>
           <div class="form-row"><label for="replyName">Your name / nickname <span>(required)</span></label><input id="replyName" name="name" type="text" maxlength="60" placeholder="Whatever I should call you 😌" required></div>
           <div class="form-row"><label for="webExperience">Did you like the website? 💻❤️</label><select id="webExperience" name="website_experience" required><option value="" selected disabled>Choose one…</option><option>Loved it ❤️</option><option>It was really sweet 🥹</option><option>Pretty good 😌</option><option>It needs work 😂</option><option>I have complaints. Lots of them. 😭</option></select></div>
           <div class="form-row"><label for="softAnswer">And… about that boyfriend application? 👀</label><select id="softAnswer" name="soft_launch_response" required><option value="" selected disabled>Choose the honest answer…</option><option>Yes — application accepted. ❤️</option><option>Maybe… let me think. 😭</option><option>I like the idea, but I need time. 😌</option><option>You're staying in the friend department. 😂</option><option>I would like to discuss this properly.</option></select></div>
           <div class="form-row"><label for="extraMessage">Tell me your thoughts</label><textarea id="extraMessage" name="message" maxlength="1200" rows="6" placeholder="Your honest review, roasting, compliments, threats, thoughts… anything. 😂❤️"></textarea><div class="char-count"><span id="charCount">0</span>/1200</div></div>
+          <div class="voice-note-field" id="voiceNoteField">
+            <div class="voice-note-head">
+              <div>
+                <span class="tiny">OPTIONAL · SAY IT OUT LOUD</span>
+                <h3>Leave me a voice note 🎙️</h3>
+              </div>
+              <span class="voice-note-limit">UP TO 3 MIN</span>
+            </div>
+            <p class="voice-note-copy">Tell me how you felt seeing this page, what made you smile, what you want to say, or just talk. Your recording will be attached to your reply.</p>
+            <div class="voice-recorder" aria-label="Voice note recorder">
+              <button type="button" class="voice-record-btn" id="voiceRecordBtn" aria-pressed="false">
+                <span class="voice-mic-icon" aria-hidden="true">●</span>
+                <span id="voiceRecordText">Start recording</span>
+              </button>
+              <span class="voice-timer" id="voiceTimer" aria-live="polite">00:00</span>
+              <span class="voice-state" id="voiceState">Ready when you are.</span>
+            </div>
+            <div class="voice-preview" id="voicePreviewWrap" hidden>
+              <audio id="voicePreview" controls preload="metadata"></audio>
+              <button type="button" class="ghost-btn voice-clear-btn" id="voiceClearBtn">Record again</button>
+            </div>
+            <input id="voiceNoteFile" class="voice-file-input" type="file" name="voice_note" accept="audio/*" tabindex="-1" aria-hidden="true">
+            <p id="voiceNoteStatus" class="voice-note-status" role="status" aria-live="polite"></p>
+          </div>
           <input type="hidden" name="quiz_score" id="quizScoreHidden" value="0/5">
           <input type="hidden" name="quiz_answers" id="quizAnswersHidden" value="">
           <input type="hidden" name="_subject" value="Shejal replied to the birthday surprise 💌">
@@ -320,6 +344,6 @@
   </main>
 
   <script src="config.js"></script>
-  <script src="script.js?v=20260927-gallery-final-index-fix"></script>
+  <script src="script.js?v=20260927-voice-note"></script>
 </body>
 </html>
