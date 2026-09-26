@@ -31,7 +31,7 @@ function renderQ(){
  if(!q || !box) return;
  $('#progressBar').style.width=((qi)/questions.length*100)+'%';
  box.innerHTML=`<div class="q-count">Question ${qi+1} / ${questions.length}</div><div class="question">${q.q}</div><div class="answers">${q.a.map((x,i)=>`<button class="answer" type="button" data-i="${i}">${String.fromCharCode(65+i)}. ${x}</button>`).join('')}</div>`;
- $('#quizResult').textContent=`Score: ${quizScore} / ${questions.length}`;
+ $('#quizResult').textContent=`Score: ${quizScore} / ${questions.length}`; $('#quizScorePill') && ($('#quizScorePill').textContent=`${quizScore} / ${questions.length}`);
  $$('.answer').forEach(btn=>btn.addEventListener('click',()=>answer(+btn.dataset.i),{once:true}));
 }
 
@@ -44,17 +44,17 @@ function answer(i){
  if(i===q.correct) quizScore++;
  quizAnswers.push(i===q.correct ? `Correct (${String.fromCharCode(65+i)})` : `Wrong (${String.fromCharCode(65+i)}; correct ${String.fromCharCode(65+q.correct)})`);
  syncQuizMeta();
- $('#quizResult').textContent=`${i===q.correct?q.ok:'Wrong. But honestly, I\'ll allow it. 😂'}  ·  Score: ${quizScore}/${questions.length}`;
+ $('#quizResult').textContent=`${i===q.correct?q.ok:'Wrong. But honestly, I\'ll allow it. 😂'}  ·  Score: ${quizScore}/${questions.length}`; $('#quizScorePill') && ($('#quizScorePill').textContent=`${quizScore} / ${questions.length}`);
  window.setTimeout(()=>{
    qi++;
    if(qi<questions.length){
      renderQ();
    }else{
      $('#progressBar').style.width='100%';
-     $('#questionBox').innerHTML=`<div class="q-count">TEST COMPLETE</div><div class="quiz-final-score"><span>Your friendship-audit score</span><strong>${quizScore} / ${questions.length}</strong><small>${quizScore===questions.length?'Perfect score. Suspiciously impressive. 😌':quizScore>=3?'Not bad. The friendship survives another audit. 😂':'Okay… we clearly need another 15 years of friendship training. 😭'}</small></div><button class="primary-btn" type="button" data-scroll="#secret">There is still something →</button>`;
+     $('#questionBox').innerHTML=`<div class="q-count">TEST COMPLETE</div><div class="quiz-final-score"><span>Your memory-check score</span><strong>${quizScore} / ${questions.length}</strong><small>${quizScore===questions.length?'Perfect score. Suspiciously impressive. 😌':quizScore>=3?'Not bad. The friendship survives another memory check. 😂':'Okay… we clearly need another 15 years of friendship training. 😭'}</small></div><button class="primary-btn" type="button" data-scroll="#secret">There is still something →</button>`;
      $('#quizResult').textContent=`Final result: ${quizScore}/${questions.length}. Your answers will also be included with your reply.`;
      $('#questionBox .primary-btn')?.addEventListener('click',()=>$('#secret')?.scrollIntoView({behavior:'smooth'}),{once:true});
-     syncQuizMeta();
+     syncQuizMeta(); $('#quizScorePill') && ($('#quizScorePill').textContent=`${quizScore} / ${questions.length}`);
    }
  },700);
 }
@@ -260,4 +260,37 @@ function launchConfetti(){
      syncQuizMeta();
    },1600);
  });
+})();
+
+
+/* ===== BIRTHDAY JOURNEY NAV ===== */
+(()=>{
+ const dots=[...document.querySelectorAll('[data-journey]')];
+ const targets=dots.map(btn=>document.getElementById(btn.dataset.journey)).filter(Boolean);
+ const counter=$('#journeyCount');
+ const setActive=(id)=>{
+   const idx=dots.findIndex(d=>d.dataset.journey===id);
+   dots.forEach((d,i)=>d.setAttribute('aria-current',String(i===idx)));
+   if(counter) counter.textContent=String(Math.max(1,idx+1)).padStart(2,'0');
+ };
+ dots.forEach(btn=>btn.addEventListener('click',()=>document.getElementById(btn.dataset.journey)?.scrollIntoView({behavior:'smooth',block:'start'})));
+ if('IntersectionObserver' in window){
+   const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)setActive(e.target.id)}),{rootMargin:'-38% 0px -48% 0px',threshold:0});
+   targets.forEach(t=>io.observe(t));
+ }
+})();
+
+/* ===== PHOTO MICRO-INTERACTION ===== */
+(()=>{
+ if(matchMedia('(pointer:fine)').matches){
+   document.querySelectorAll('.photo-card').forEach(card=>{
+     card.addEventListener('pointermove',e=>{
+       const r=card.getBoundingClientRect();
+       const x=(e.clientX-r.left)/r.width-.5;
+       const y=(e.clientY-r.top)/r.height-.5;
+       card.style.transform=`translateY(-5px) rotateX(${-y*3}deg) rotateY(${x*3}deg)`;
+     });
+     card.addEventListener('pointerleave',()=>card.style.transform='');
+   });
+ }
 })();
