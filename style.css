@@ -74,3 +74,5 @@ body.lightbox-active{overflow:hidden}
 @media (max-width:640px){
   .photo-card:before{display:none!important}
 }
+.voice-preview-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%}.voice-play-btn{padding:10px 14px;font-size:11px}.voice-play-btn:disabled{opacity:.55;cursor:not-allowed}.voice-preview-head span{font-size:10px;color:var(--muted);line-height:1.5}
+@media (max-width:640px){.voice-preview-head{align-items:stretch}.voice-play-btn{width:100%}.voice-preview-head span{width:100%}}

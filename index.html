@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260927-voice-note">
+  <link rel="stylesheet" href="style.css?v=20260927-voice-required-v2">
   <link rel="icon" href="assets/photo-11.webp" type="image/webp">
 </head>
 <body>
@@ -280,13 +280,13 @@
           <div class="voice-note-field" id="voiceNoteField">
             <div class="voice-note-head">
               <div>
-                <span class="tiny">OPTIONAL · SAY IT OUT LOUD</span>
+                <span class="tiny">REQUIRED · SAY IT OUT LOUD</span>
                 <h3>Leave me a voice note 🎙️</h3>
               </div>
-              <span class="voice-note-limit">UP TO 3 MIN</span>
+              <span class="voice-note-limit">UP TO 8 MIN · MAX 9 MB</span>
             </div>
-            <p class="voice-note-copy">Tell me how you felt seeing this page, what made you smile, what you want to say, or just talk. Your recording will be attached to your reply.</p>
-            <div class="voice-recorder" aria-label="Voice note recorder">
+            <p class="voice-note-copy">Tell me how you felt seeing this page, what made you smile, what you want to say, or just talk. A voice note is required and will be attached to your reply.</p>
+            <div class="voice-recorder" aria-label="Voice note recorder" aria-describedby="voiceNoteStatus">
               <button type="button" class="voice-record-btn" id="voiceRecordBtn" aria-pressed="false">
                 <span class="voice-mic-icon" aria-hidden="true">●</span>
                 <span id="voiceRecordText">Start recording</span>
@@ -295,10 +295,14 @@
               <span class="voice-state" id="voiceState">Ready when you are.</span>
             </div>
             <div class="voice-preview" id="voicePreviewWrap" hidden>
-              <audio id="voicePreview" controls preload="metadata"></audio>
+              <div class="voice-preview-head">
+                <button type="button" class="ghost-btn voice-play-btn" id="voicePlayBtn">▶ Listen to my voice note</button>
+                <span id="voicePreviewMeta">Ready to preview before sending.</span>
+              </div>
+              <audio id="voicePreview" controls preload="auto"></audio>
               <button type="button" class="ghost-btn voice-clear-btn" id="voiceClearBtn">Record again</button>
             </div>
-            <input id="voiceNoteFile" class="voice-file-input" type="file" name="voice_note" accept="audio/*" tabindex="-1" aria-hidden="true">
+            <input id="voiceNoteFile" class="voice-file-input" type="file" name="voice_note" accept="audio/*" required tabindex="-1" aria-hidden="true" aria-label="Required voice note">
             <p id="voiceNoteStatus" class="voice-note-status" role="status" aria-live="polite"></p>
           </div>
           <input type="hidden" name="quiz_score" id="quizScoreHidden" value="0/5">
@@ -344,6 +348,6 @@
   </main>
 
   <script src="config.js"></script>
-  <script src="script.js?v=20260927-voice-note"></script>
+  <script src="script.js?v=20260927-voice-required-v2"></script>
 </body>
 </html>
