@@ -24,3 +24,9 @@ assets/
 
 ## Important
 GitHub Pages serves static files, so it cannot itself store form submissions. This version uses FormSubmit for the reply form. Configure the endpoint in `config.js` before publishing.
+
+
+### Recent form update
+- Name / nickname is required before submitting the reply.
+- The free-text field is labeled “Tell me your thoughts”.
+- The final celebration photo and text are explicitly centered for consistent alignment across desktop and mobile.
