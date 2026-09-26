@@ -37,3 +37,29 @@ body{isolation:isolate}
 .birthday-video-caption .caption-signoff{color:#d6c9d2;margin-top:14px}
 .birthday-video-caption em{color:#efabc9}
 @media(max-width:649px){.birthday-video-shell{padding:8px;border-radius:23px}.birthday-video-frame,.birthday-video-frame:after{border-radius:17px}.birthday-play{width:62px;height:62px}.birthday-video-caption{padding:18px 8px 9px}.birthday-video-caption h3{font-size:28px}.video-corner{font-size:6.5px}}
+
+
+/* ===== ROMANTIC INTRO THEME ===== */
+.romantic-intro{position:relative;overflow:hidden}
+.romantic-intro:before,.romantic-intro:after{content:"♡";position:absolute;color:rgba(242,169,202,.10);font-family:"Cormorant Garamond",serif;pointer-events:none;line-height:1}
+.romantic-intro:before{font-size:180px;left:-25px;top:35px;transform:rotate(-14deg)}
+.romantic-intro:after{font-size:130px;right:-18px;bottom:15px;transform:rotate(12deg)}
+.romantic-card{position:relative;z-index:1;padding:34px 25px 28px;text-align:center;border:1px solid rgba(242,169,202,.20);border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(242,169,202,.055));box-shadow:0 24px 80px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:hidden}
+.romantic-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(242,169,202,.14),transparent 42%);pointer-events:none}
+.romantic-heart{position:relative;display:grid;place-items:center;width:58px;height:58px;margin:0 auto 16px;border:1px solid rgba(242,169,202,.28);border-radius:50%;background:rgba(242,169,202,.08);color:#f2a9ca;font:400 35px/1 "Cormorant Garamond",serif;box-shadow:0 0 35px rgba(242,169,202,.12)}
+.romantic-card .tiny{position:relative;color:#d99bb8}
+.romantic-card h2{position:relative;font-size:clamp(38px,10vw,58px);line-height:.96;margin:12px 0 17px;color:#f8eef3}
+.romantic-card h2 em{color:#f2a9ca;font-style:italic}
+.romantic-lead{position:relative;max-width:510px;margin:0 auto 26px;color:#cfc2cc;font:500 16px/1.65 "Cormorant Garamond",serif}
+.romantic-facts{position:relative;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(242,169,202,.14);border-bottom:1px solid rgba(242,169,202,.14);text-align:left}
+.romantic-facts div{padding:17px 10px;border-bottom:1px solid rgba(242,169,202,.10)}
+.romantic-facts div:nth-child(odd){border-right:1px solid rgba(242,169,202,.10)}
+.romantic-facts div:nth-child(3),.romantic-facts div:nth-child(4){border-bottom:0}
+.romantic-facts span,.romantic-facts strong{display:block}
+.romantic-facts span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#9c8995;margin-bottom:6px}
+.romantic-facts strong{font:600 15px/1.2 "Cormorant Garamond",serif;color:#f1dce6}
+.romantic-note{position:relative;max-width:520px;margin:23px auto 20px;color:#aaa0aa;font-size:12px;line-height:1.75}
+.romantic-text-btn{position:relative;color:#f2a9ca;padding:10px 4px}
+.romantic-text-btn span{display:inline-block;margin-left:5px;transition:transform .3s ease}
+.romantic-text-btn:hover span{transform:translateX(5px)}
+@media(max-width:649px){.romantic-card{padding:30px 19px 25px;border-radius:26px}.romantic-intro:before{font-size:125px;left:-30px}.romantic-intro:after{font-size:100px;right:-25px}.romantic-card h2{font-size:39px}.romantic-lead{font-size:15px}.romantic-facts strong{font-size:14px}}
