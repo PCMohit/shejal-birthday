@@ -202,20 +202,20 @@ function launchConfetti(){
 
  /* ----- Gallery / memory viewer ----- */
  const imageNodes=[...document.querySelectorAll('.photo-card img,.place-card img,.final-photo')];
- gallery=imageNodes.map((img,index)=>{
+ gallery=imageNodes.map((img)=>{
    const card=img.closest('.photo-card,.place-card,.celebration-content');
    const title=card?.querySelector('figcaption b')?.textContent?.trim()
      ||(img.closest('.place-card')?'Favourite place':'Shejal');
    const text=card?.querySelector('figcaption span')?.textContent?.trim()
      ||img.dataset.caption||img.alt||'';
    const src=img.getAttribute('src')||img.currentSrc||'';
-   img.dataset.memoryIndex=String(index);
+   img.dataset.memoryIndex=String(gallery.length);
    img.setAttribute('tabindex','0');
    img.setAttribute('role','button');
    img.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
    const owner=img.closest('.photo-card,.place-card,.celebration-content');
    if(owner){
-     owner.dataset.memoryIndex=String(index);
+     owner.dataset.memoryIndex=String(gallery.length);
      owner.setAttribute('tabindex','0');
      owner.setAttribute('role','button');
      owner.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
