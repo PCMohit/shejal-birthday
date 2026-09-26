@@ -16,26 +16,45 @@ const questions=[
  {q:"What was Mohit thinking after the legendary “Namaste Didi” incident? 😂",a:["Harami, bas bezzati karati haii 😭","Mere yaha aane se pehle bhi bata sakti thi ye 😭","Why are they laughing at me?","All of the above"],correct:1,ok:"YES. THAT EXACT THOUGHT. 😂"}
 ];
 let qi=0;
+let quizScore=0;
+const quizAnswers=[];
+
+function syncQuizMeta(){
+  const scoreInput=$('#quizScoreHidden');
+  const answersInput=$('#quizAnswersHidden');
+  if(scoreInput) scoreInput.value=`${quizScore}/${questions.length}`;
+  if(answersInput) answersInput.value=quizAnswers.map((a,i)=>`Q${i+1}:${a}`).join(' | ');
+}
+
 function renderQ(){
  const q=questions[qi],box=$('#questionBox');
+ if(!q || !box) return;
  $('#progressBar').style.width=((qi)/questions.length*100)+'%';
  box.innerHTML=`<div class="q-count">Question ${qi+1} / ${questions.length}</div><div class="question">${q.q}</div><div class="answers">${q.a.map((x,i)=>`<button class="answer" type="button" data-i="${i}">${String.fromCharCode(65+i)}. ${x}</button>`).join('')}</div>`;
+ $('#quizResult').textContent=`Score: ${quizScore} / ${questions.length}`;
  $$('.answer').forEach(btn=>btn.addEventListener('click',()=>answer(+btn.dataset.i),{once:true}));
 }
+
 function answer(i){
  const q=questions[qi],buttons=$$('.answer');
+ if(!q || !buttons.length) return;
  buttons.forEach(b=>b.disabled=true);
  buttons[q.correct]?.classList.add('correct');
  if(i!==q.correct) buttons[i]?.classList.add('wrong');
- $('#quizResult').textContent=i===q.correct?q.ok:'Wrong. But honestly, I\'ll allow it. 😂';
+ if(i===q.correct) quizScore++;
+ quizAnswers.push(i===q.correct ? `Correct (${String.fromCharCode(65+i)})` : `Wrong (${String.fromCharCode(65+i)}; correct ${String.fromCharCode(65+q.correct)})`);
+ syncQuizMeta();
+ $('#quizResult').textContent=`${i===q.correct?q.ok:'Wrong. But honestly, I\'ll allow it. 😂'}  ·  Score: ${quizScore}/${questions.length}`;
  window.setTimeout(()=>{
    qi++;
-   if(qi<questions.length) renderQ();
-   else{
+   if(qi<questions.length){
+     renderQ();
+   }else{
      $('#progressBar').style.width='100%';
-     $('#questionBox').innerHTML='<div class="q-count">TEST COMPLETE</div><div class="question">Congratulations. You survived the friendship audit. 🎓</div><button class="primary-btn" type="button" data-scroll="#secret">There is still something →</button>';
-     $('#quizResult').textContent='Score isn\'t important. Your friendship is. (Yes, that was disgustingly wholesome.)';
-     $('#questionBox .primary-btn').addEventListener('click',()=>$('#secret')?.scrollIntoView({behavior:'smooth'}),{once:true});
+     $('#questionBox').innerHTML=`<div class="q-count">TEST COMPLETE</div><div class="quiz-final-score"><span>Your friendship-audit score</span><strong>${quizScore} / ${questions.length}</strong><small>${quizScore===questions.length?'Perfect score. Suspiciously impressive. 😌':quizScore>=3?'Not bad. The friendship survives another audit. 😂':'Okay… we clearly need another 15 years of friendship training. 😭'}</small></div><button class="primary-btn" type="button" data-scroll="#secret">There is still something →</button>`;
+     $('#quizResult').textContent=`Final result: ${quizScore}/${questions.length}. Your answers will also be included with your reply.`;
+     $('#questionBox .primary-btn')?.addEventListener('click',()=>$('#secret')?.scrollIntoView({behavior:'smooth'}),{once:true});
+     syncQuizMeta();
    }
  },700);
 }
@@ -82,14 +101,63 @@ $('#secretBtn')?.addEventListener('click',()=>{
 })();
 
 /* ===== HONEST FINAL QUESTION ===== */
-const noBtn=$('#noBtn'),noText=$('#noText');
-noBtn?.addEventListener('click',()=>{
- if(noText) noText.textContent='Fair enough. I respect honest answers. 😭❤️';
-});
+const noBtn=$('#noBtn'),noText=$('#noText'),choiceArea=document.querySelector('.choice-area');
+let noClicks=0;
+let lastDodge=0;
+
+function dodgeNoButton(pointerX=null,pointerY=null){
+  if(!noBtn || !choiceArea) return;
+  const now=performance.now();
+  if(now-lastDodge<220) return;
+  lastDodge=now;
+  noClicks++;
+
+  const messages=[
+    'Are you sure? 👀',
+    'Think again. 😭',
+    'That button is suspiciously fast. 😂',
+    'NO is trying to escape the conversation. 💀',
+    'Nice try. 😌'
+  ];
+  if(noText) noText.textContent=messages[Math.min(noClicks-1,messages.length-1)];
+
+  const areaRect=choiceArea.getBoundingClientRect();
+  const btnRect=noBtn.getBoundingClientRect();
+  const pad=8;
+  const maxX=Math.max(0,(areaRect.width-btnRect.width)/2-pad);
+  const maxY=Math.max(0,(areaRect.height-btnRect.height)/2-pad);
+
+  // Keep the button inside the choice area and, when possible, away from the pointer.
+  let x=0,y=0;
+  for(let n=0;n<18;n++){
+    x=(Math.random()*2-1)*maxX;
+    y=(Math.random()*2-1)*maxY;
+    if(pointerX==null || pointerY==null) break;
+    const targetX=areaRect.left+areaRect.width/2+x;
+    const targetY=areaRect.top+areaRect.height/2+y;
+    if(Math.hypot(targetX-pointerX,targetY-pointerY)>110) break;
+  }
+  noBtn.style.position='absolute';
+  noBtn.style.left='50%';
+  noBtn.style.top='50%';
+  noBtn.style.transform=`translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+}
+
+noBtn?.addEventListener('pointerenter',e=>dodgeNoButton(e.clientX,e.clientY));
+choiceArea?.addEventListener('pointermove',e=>{
+  if(!noBtn || e.pointerType==='touch') return;
+  const r=noBtn.getBoundingClientRect();
+  const cx=r.left+r.width/2,cy=r.top+r.height/2;
+  if(Math.hypot(e.clientX-cx,e.clientY-cy)<115) dodgeNoButton(e.clientX,e.clientY);
+},{passive:true});
+noBtn?.addEventListener('touchstart',e=>{e.preventDefault();dodgeNoButton(e.touches[0]?.clientX,e.touches[0]?.clientY);},{passive:false});
+noBtn?.addEventListener('click',e=>{e.preventDefault();dodgeNoButton(e.clientX,e.clientY);});
+
 $('#yesBtn')?.addEventListener('click',()=>{
  $('#finale').style.display='none';
  const c=$('#celebration'); c.classList.add('active'); c.scrollIntoView({behavior:'smooth'}); launchConfetti();
 });
+
 function launchConfetti(){
  const canvas=$('#confetti'),ctx=canvas.getContext('2d');
  let W=innerWidth,H=innerHeight,dpr=Math.min(devicePixelRatio||1,2);
@@ -172,14 +240,24 @@ function launchConfetti(){
  form.action=SITE_CONFIG.replyEndpoint||'';
  const updateCount=()=>{if(count&&extra)count.textContent=extra.value.length;};
  extra?.addEventListener('input',updateCount);updateCount();
+ syncQuizMeta();
  form.addEventListener('submit',e=>{
    if(!SITE_CONFIG.replyEndpoint){e.preventDefault();status.textContent='Reply service is not configured yet. Replace the endpoint in config.js with your FormSubmit URL.';status.className='reply-status error';return;}
    const required=[...form.querySelectorAll('[required]')];
    const missing=required.find(el=>!el.value);
    if(missing){e.preventDefault();missing.focus();status.textContent='Please answer both questions before sending. ❤️';status.className='reply-status error';return;}
-   if(form.querySelector('input[name="_honey"]').value){e.preventDefault();return;}
+   if(form.querySelector('input[name="_honey"]')?.value){e.preventDefault();return;}
+   syncQuizMeta();
    submit.disabled=true;submit.textContent='Sending…';status.textContent='Sending your reply…';status.className='reply-status';
-   // FormSubmit posts into a hidden iframe, so keep the page in place and show a local confirmation.
-   window.setTimeout(()=>{status.textContent='Your reply was sent. Thank you for being honest. ❤️';status.className='reply-status success';submit.disabled=false;submit.textContent='Send my reply 💌';form.reset();updateCount();},1500);
+   // FormSubmit posts into a hidden iframe, so keep the page in place.
+   window.setTimeout(()=>{
+     status.textContent='Your reply was sent. Thank you for being honest. ❤️';
+     status.className='reply-status success';
+     submit.disabled=false;
+     submit.textContent='Send my reply 💌';
+     form.reset();
+     updateCount();
+     syncQuizMeta();
+   },1600);
  });
 })();

@@ -79,3 +79,14 @@ body{isolation:isolate}
 .honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 @media(min-width:650px){.reply-wrap{padding:34px 30px}.soft-modal-card{padding:34px 28px}.soft-modal-actions{justify-content:center}}
 @media(max-width:520px){.soft-modal{padding:10px}.soft-modal-card{border-radius:23px;padding:25px 17px 18px}.soft-modal-card h2{font-size:40px}.soft-modal-actions{flex-direction:column}.soft-modal-actions .primary-btn,.soft-modal-actions .ghost-btn{width:100%}.soft-launch-card{padding:28px 18px}.reply-wrap{padding:25px 16px}}
+
+/* ===== QUIZ RESULT ===== */
+.quiz-final-score{display:grid;justify-items:center;gap:7px;text-align:center;padding:18px 8px 22px}
+.quiz-final-score span{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#8d818f}
+.quiz-final-score strong{font:600 clamp(54px,14vw,78px)/.85 "Cormorant Garamond",serif;color:#f2a9ca}
+.quiz-final-score small{font-size:11px;line-height:1.6;color:#aaa1ad;max-width:430px}
+.quiz-final-score+.primary-btn{display:block;margin:0 auto}
+
+/* ===== MOBILE-FRIENDLY DODGE BUTTON ===== */
+.choice-area{min-height:110px}
+.no-btn{will-change:transform,left,top}
