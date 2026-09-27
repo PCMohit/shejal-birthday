@@ -76,3 +76,9 @@ body.lightbox-active{overflow:hidden}
 }
 .voice-preview-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%}.voice-play-btn{padding:10px 14px;font-size:11px}.voice-play-btn:disabled{opacity:.55;cursor:not-allowed}.voice-preview-head span{font-size:10px;color:var(--muted);line-height:1.5}
 @media (max-width:640px){.voice-preview-head{align-items:stretch}.voice-play-btn{width:100%}.voice-preview-head span{width:100%}}
+
+/* Same-page submission confirmation */
+.reply-submit.submitted {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 46px rgba(242,169,201,.24);
+}

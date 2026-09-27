@@ -10,10 +10,10 @@ $$('[data-scroll]').forEach(btn=>btn.addEventListener('click',()=>$(btn.dataset.
 /* ===== QUIZ ===== */
 const questions=[
  {q:"Be honest… who is the bigger headache in this friendship? 😂",a:["Obviously Mohit","Obviously Shejal","Both are equally problematic","This question is unfair 😭"],correct:3,ok:"Correct. The question WAS unfair. 😌"},
- {q:"How many times have you promised me “I'll send you the pictures later”? 😂",a:["2–3 times","10+ times","I don't remember 😌","Nice try. I'm not exposing myself."],correct:1,ok:"The evidence says 10+. The defence rests. 💀"},
+ {q:"How many times have you promised me “I'll send you the pictures later”? 😂",a:["2–3 times","10+ times","I don't remember 😌","Nice try. I'm not exposing myself."],correct:1,ok:"Looks like 10+. That answer checks out. 💀"},
  {q:"If I ask you AGAIN to meet, what are you most likely to say? 😂",a:["Yes, finally!","I'll see…","I'm busy.","Ask my parents first. 💀"],correct:1,ok:"Exactly. “I'll see…” — the national anthem of this friendship. 😂"},
  {q:"Who usually starts the conversation? 👀",a:["Shejal","Mohit","Whoever remembers the other person exists 😂","Nobody. We communicate telepathically."],correct:1,ok:"Correct. I have accepted my destiny. 😭"},
- {q:"What was Mohit thinking after the legendary “Namaste Didi” incident? 😂",a:["Harami, bas bezzati karati haii 😭","Mere yaha aane se pehle bhi bata sakti thi ye 😭","Why are they laughing at me?","All of the above"],correct:1,ok:"YES. THAT EXACT THOUGHT. 😂"}
+ {q:"What was Mohit thinking after the legendary “Namaste Didi” moment? 😂",a:["Harami, bas bezzati karati haii 😭","Mere yaha aane se pehle bhi bata sakti thi ye 😭","Why are they laughing at me?","All of the above"],correct:1,ok:"YES. THAT EXACT THOUGHT. 😂"}
 ];
 let qi=0;
 let quizScore=0;
@@ -360,7 +360,7 @@ function launchConfetti(){
 (()=>{
  const form=$('#replyForm'),status=$('#replyStatus'),submit=$('#replySubmit'),count=$('#charCount'),extra=$('#extraMessage');
  if(!form)return;
- form.action=SITE_CONFIG.replyEndpoint||'';
+ form.action='';
  const updateCount=()=>{if(count&&extra)count.textContent=extra.value.length;};
  extra?.addEventListener('input',updateCount);updateCount();
  syncQuizMeta();
@@ -621,13 +621,23 @@ function launchConfetti(){
        throw new Error(message);
      }
 
-     status.textContent='Sent successfully. Your reply and voice note reached me. ❤️';
-     status.className='reply-status success';
-     setVoiceStatus('Voice note sent successfully with your reply. ❤️','success');
-     setSubmitState(true,'Reply sent ✓');
-     form.querySelectorAll('input,select,textarea,button').forEach(el=>{
-       if(el!==submit)el.disabled=true;
-     });
+     // Keep the experience on this page: briefly replace the send button with a
+     // confirmation label, then return it to its original state. No redirect,
+     // popup, new tab, or external thank-you page.
+     status.textContent='';
+     status.className='reply-status';
+     setVoiceStatus('','');
+     if(submit){
+       const originalText='Send my reply 💌';
+       submit.disabled=true;
+       submit.textContent='Submitted ✓';
+       submit.classList.add('submitted');
+       window.setTimeout(()=>{
+         submit.disabled=false;
+         submit.textContent=originalText;
+         submit.classList.remove('submitted');
+       },1000);
+     }
    }catch(err){
      setSubmitState(false);
      status.textContent=err?.message?.includes('Failed to fetch')
