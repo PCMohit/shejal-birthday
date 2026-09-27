@@ -4,12 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0b0d17">
-  <meta name="description" content="A little birthday surprise for Shejal, made by Mohit.">
+  <meta name="description" content="A little birthday journey made for Shejal — memories, photos, a few questions, and one final surprise.">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="canonical" href="https://pcmohit.github.io/shejal-birthday/">
+
+  <!-- Social / share preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="For Shejal — 22 ✨">
+  <meta property="og:description" content="A little birthday journey made for you. ❤️">
+  <meta property="og:url" content="https://pcmohit.github.io/shejal-birthday/">
+  <meta property="og:image" content="https://pcmohit.github.io/shejal-birthday/assets/social-preview.jpg">
+  <meta property="og:image:alt" content="A birthday surprise made for Shejal">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="For Shejal — 22 ✨">
+  <meta name="twitter:description" content="A little birthday journey made for you. ❤️">
+  <meta name="twitter:image" content="https://pcmohit.github.io/shejal-birthday/assets/social-preview.jpg">
   <title>For Shejal — 22 ✨</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260927-voice-required-v2">
+  <link rel="stylesheet" href="style.css?v=20260927-final-polish-v3">
   <link rel="icon" href="assets/photo-11.webp" type="image/webp">
 </head>
 <body>
@@ -23,24 +41,24 @@
 
   <div class="journey-bar" aria-label="Birthday journey navigation">
     <div class="journey-brand">SHEJAL <span>·</span> 22</div>
-    <nav class="journey-dots" aria-label="Chapters">
+    <nav class="journey-dots" aria-label="Birthday journey chapters">
       <button data-journey="home" aria-label="Opening" aria-current="true"></button>
-      <button data-journey="intro" aria-label="Chapter 1"></button>
-      <button data-journey="story" aria-label="Chapter 2"></button>
-      <button data-journey="photos" aria-label="Chapter 3"></button>
-      <button data-journey="birthday-edit" aria-label="Chapter 4"></button>
-      <button data-journey="place" aria-label="Chapter 5"></button>
-      <button data-journey="quiz" aria-label="Chapter 6"></button>
-      <button data-journey="secret" aria-label="Chapter 7"></button>
-      <button data-journey="letter" aria-label="Chapter 8"></button>
-      <button data-journey="soft-launch" aria-label="Chapter 9"></button>
-      <button data-journey="reply" aria-label="Chapter 10"></button>
-      <button data-journey="finale" aria-label="Final question"></button>
+      <button data-journey="intro" aria-label="Chapter 1 — The person behind the memories"></button>
+      <button data-journey="story" aria-label="Chapter 2 — Fifteen years"></button>
+      <button data-journey="photos" aria-label="Chapter 3 — Photo memories"></button>
+      <button data-journey="birthday-edit" aria-label="Chapter 4 — Birthday film"></button>
+      <button data-journey="place" aria-label="Chapter 5 — Khatu"></button>
+      <button data-journey="quiz" aria-label="Chapter 6 — Memory check"></button>
+      <button data-journey="secret" aria-label="Chapter 7 — Hidden note"></button>
+      <button data-journey="letter" aria-label="Chapter 8 — A letter"></button>
+      <button data-journey="soft-launch" aria-label="Chapter 9 — One question"></button>
+      <button data-journey="reply" aria-label="Chapter 10 — Your reply"></button>
+      <button data-journey="finale" aria-label="Chapter 11 — Final question"></button>
     </nav>
-    <div class="journey-counter"><span id="journeyCount">01</span> / 12</div>
+    <div class="journey-counter"><span class="journey-counter-word">CHAPTER</span> <span id="journeyCount">01</span> <span aria-hidden="true">·</span> 12</div>
   </div>
 
-  <div id="lightbox" class="lightbox" aria-hidden="true">
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" aria-describedby="lightboxText">
     <button id="lightboxClose" class="lightbox-close" aria-label="Close image">×</button>
     <button id="lightboxPrev" class="lightbox-nav lightbox-prev" aria-label="Previous image">‹</button>
     <div class="lightbox-inner">
@@ -48,7 +66,7 @@
       <div class="lightbox-caption">
         <div class="lightbox-caption-top">
           <span id="lightboxIndex" class="lightbox-index"></span>
-          <span class="lightbox-viewhint">MEMORY VIEWER · TAP OUTSIDE TO CLOSE</span>
+          <span class="lightbox-viewhint">MEMORY VIEWER · SWIPE OR USE ARROWS</span>
         </div>
         <h3 id="lightboxTitle"></h3>
         <p id="lightboxText"></p>
@@ -61,7 +79,7 @@
     <div class="soft-modal-backdrop" data-soft-close></div>
     <div class="soft-modal-card" role="dialog" aria-modal="true" aria-labelledby="softLaunchTitle">
       <button id="softLaunchClose" class="soft-modal-close" type="button" aria-label="Close message">×</button>
-      <p class="tiny">PRIVATE MESSAGE · DO NOT PANIC 😌</p>
+      <p class="tiny">A PRIVATE NOTE · DO NOT PANIC 😌</p>
       <h2 id="softLaunchTitle">Okay… I have a slightly suspicious question. 💌</h2>
       <div class="soft-chat">
         <div class="soft-bubble me">After 15 years of friendship, I think I should finally ask something properly.</div>
@@ -69,7 +87,7 @@
         <div class="soft-bubble me">So… would you consider a small friendship upgrade?</div>
         <div class="soft-bubble me highlight">May I apply for the position of your boyfriend? 😂❤️</div>
       </div>
-      <p class="soft-note">No pressure, no disappearing NO button, no awkward interview round. Just a very serious application from a very unserious person. 😭</p>
+      <p class="soft-note">No pressure. Although the NO button may have developed commitment issues. 😂</p>
       <div class="soft-modal-actions">
         <button class="primary-btn" id="softReplyYes" type="button">I have an answer 💌</button>
         <button class="ghost-btn" id="softReplyLater" type="button">I need processing time 😂</button>
@@ -109,15 +127,15 @@
       <div class="glass card intro-card" data-reveal>
         <div class="profile-stamp"><span>22</span><small>YEARS</small></div>
         <div class="intro-copy">
-          <p class="tiny">CONFIDENTIAL — BUT MAKE IT CUTE</p>
-          <h3>Subject: <em>Shejal Agrawal</em></h3>
+          <p class="tiny">A LITTLE ABOUT YOU</p>
+          <h3>Meet <em>Shejal Agrawal</em></h3>
           <div class="facts">
             <div><span>Known for</span><strong>15 years</strong></div>
             <div><span>Current age</span><strong>22 🎂</strong></div>
-            <div><span>Known weakness</span><strong>I'll send pictures later.</strong></div>
+            <div><span>Signature move</span><strong>I'll send pictures later.</strong></div>
             <div><span>Favourite place</span><strong>Khatu, Rajasthan</strong></div>
           </div>
-          <p class="note">Investigation status: still trying to schedule one meeting with the subject. Results remain inconclusive. 👀</p>
+          <p class="note">Current situation: still trying to schedule one meeting with you. Results remain hilariously inconclusive. 👀</p>
           <button class="text-btn" data-scroll="#story">Okay, show me the story →</button>
         </div>
       </div>
@@ -128,7 +146,7 @@
       <div class="section-label"><span>02</span> FIFTEEN YEARS, SOMEHOW</div>
       <div class="story-layout">
         <div class="story-intro">
-          <p class="tiny">CHAPTER TWO · THE DISTANCE TEST</p>
+          <p class="tiny">CHAPTER TWO · HOW WE STAYED FRIENDS</p>
           <h2>Different places.<br><em>Same friendship.</em></h2>
           <div class="story-number">15<span>years</span></div>
         </div>
@@ -145,33 +163,33 @@
     </section>
 
     <section class="section chapter photo-section" id="photos" data-chapter="03">
-      <div class="section-label"><span>03</span> THE GALLERY I HAD TO EARN <span class="tap-note">· tap any photo</span></div>
+      <div class="section-label"><span>03</span> A FEW MEMORIES I HAD TO EARN <span class="tap-note">· tap any photo</span></div>
       <div class="chapter-head split-head">
         <div>
-          <p class="tiny">CHAPTER THREE · PHOTO DUMP</p>
+          <p class="tiny">CHAPTER THREE · MEMORY DROP</p>
           <h2>A gallery I had to <em>beg</em> for. 😂</h2>
         </div>
-        <p class="section-intro">Because apparently getting Shejal's pictures requires repeated applications, reminders, and a miracle.</p>
+        <p class="section-intro">Because apparently getting Shejal's pictures requires repeated reminders and a small miracle.</p>
       </div>
 
       <div class="photo-reel" id="photoGallery">
         <figure class="photo-card tall" data-reveal>
-          <img src="assets/photo-06.webp" alt="Shejal smiling" loading="eager" fetchpriority="high" decoding="async" data-caption="Shejal's favourite defence: I already sent you good pictures.">
-          <figcaption><b>Exhibit A</b><span>Shejal's favourite defence: “I already sent you good pictures.”</span></figcaption>
+          <img src="assets/photo-06.webp" alt="Shejal smiling" loading="eager" fetchpriority="high" decoding="async" data-caption="Shejal's favourite line: I already sent you good pictures.">
+          <figcaption><b>Memory 01</b><span>Shejal's favourite line: “I already sent you good pictures.”</span></figcaption>
         </figure>
-        <figure class="photo-card" data-reveal><img src="assets/photo-05.webp" alt="Shejal dressed up" loading="lazy" decoding="async" data-caption="Okay... this one was worth the wait."><figcaption><b>Exhibit B</b><span>Okay... this one was worth the wait.</span></figcaption></figure>
-        <figure class="photo-card" data-reveal><img src="assets/photo-04.webp" alt="Shejal at an event" loading="lazy" decoding="async" data-caption="Still waiting for the next batch."><figcaption><b>Exhibit C</b><span>Still waiting for the next batch.</span></figcaption></figure>
-        <figure class="photo-card" data-reveal><img src="assets/photo-03.webp" alt="Shejal" loading="lazy" decoding="async" data-caption="Proof that the camera roll is not actually empty."><figcaption><b>Exhibit D</b><span>Proof that the camera roll is not actually empty.</span></figcaption></figure>
-        <figure class="photo-card" data-reveal><img src="assets/photo-02.webp" alt="Shejal" loading="lazy" decoding="async" data-caption="I'll send it later. — historical records, apparently."><figcaption><b>Exhibit E</b><span>“I'll send it later.” — historical records, apparently.</span></figcaption></figure>
-        <figure class="photo-card" data-reveal><img src="assets/photo-07.webp" alt="Shejal" loading="lazy" decoding="async" data-caption="More evidence. Still no explanation."><figcaption><b>Exhibit F</b><span>More evidence. Still no explanation.</span></figcaption></figure>
-        <figure class="photo-card" data-reveal><img src="assets/photo-08.webp" alt="Shejal smiling in a black and silver outfit" loading="lazy" decoding="async" data-caption="Bonus evidence: the camera roll definitely had more to offer."><figcaption><b>Exhibit G</b><span>Bonus evidence: the camera roll definitely had more to offer.</span></figcaption></figure>
-        <figure class="photo-card" data-reveal><img src="assets/photo-09.webp" alt="Shejal taking a mirror selfie" loading="lazy" decoding="async" data-caption="The mirror department has officially submitted evidence."><figcaption><b>Exhibit H</b><span>The mirror department has officially submitted evidence.</span></figcaption></figure>
-        <figure class="photo-card" data-reveal><img src="assets/together.webp" alt="A photo of Shejal and Mohit together" loading="lazy" decoding="async" data-caption="Rare photographic evidence of both of us existing in the same frame. ❤️"><figcaption><b>Exhibit J</b><span>Rare photographic evidence of both of us existing in the same frame. ❤️</span></figcaption></figure>
-        <figure class="photo-card" data-reveal><img src="assets/funny.webp" alt="Shejal at home" loading="lazy" decoding="async" data-caption="Unfiltered evidence. Zero objections will be accepted. 😂"><figcaption><b>Exhibit K</b><span>Unfiltered evidence. Zero objections will be accepted. 😂</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/photo-05.webp" alt="Shejal dressed up" loading="lazy" decoding="async" data-caption="Okay... this one was worth the wait."><figcaption><b>Memory 02</b><span>Okay... this one was worth the wait.</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/photo-04.webp" alt="Shejal at an event" loading="lazy" decoding="async" data-caption="Still waiting for the next batch."><figcaption><b>Memory 03</b><span>Still waiting for the next batch.</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/photo-03.webp" alt="Shejal" loading="lazy" decoding="async" data-caption="Proof that the camera roll is not actually empty."><figcaption><b>Memory 04</b><span>Proof that the camera roll is not actually empty.</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/photo-02.webp" alt="Shejal" loading="lazy" decoding="async" data-caption="I'll send it later. — historical records, apparently."><figcaption><b>Memory 05</b><span>“I'll send it later.” — this one apparently took forever.</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/photo-07.webp" alt="Shejal" loading="lazy" decoding="async" data-caption="More pictures. Still no explanation."><figcaption><b>Memory 06</b><span>More pictures. Still no explanation.</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/photo-08.webp" alt="Shejal smiling in a black and silver outfit" loading="lazy" decoding="async" data-caption="Bonus memory: the camera roll definitely had more to offer."><figcaption><b>Memory 07</b><span>Bonus memory: the camera roll definitely had more to offer.</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/photo-09.webp" alt="Shejal taking a mirror selfie" loading="lazy" decoding="async" data-caption="The mirror roll has officially delivered again."><figcaption><b>Memory 08</b><span>The mirror roll has officially delivered again.</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/together.webp" alt="A photo of Shejal and Mohit together" loading="lazy" decoding="async" data-caption="Rare photographic proof of both of us existing in the same frame. ❤️"><figcaption><b>Memory 09</b><span>Rare photographic proof of both of us existing in the same frame. ❤️</span></figcaption></figure>
+        <figure class="photo-card" data-reveal><img src="assets/funny.webp" alt="Shejal at home" loading="lazy" decoding="async" data-caption="Unfiltered memory. Zero objections will be accepted. 😂"><figcaption><b>Memory 10</b><span>Unfiltered memory. Zero objections will be accepted. 😂</span></figcaption></figure>
       </div>
 
       <div class="video-card glass" data-reveal>
-        <div><p class="tiny">BONUS EVIDENCE 🎥</p><h3>Because one video was somehow easier to obtain.</h3></div>
+        <div><p class="tiny">BONUS MEMORY 🎥</p><h3>Because one video was somehow easier to obtain.</h3></div>
         <video id="memoryVideo" controls playsinline preload="none" poster="assets/photo-11.webp" data-src="assets/shejal-video.mp4"><source data-src="assets/shejal-video.mp4" type="video/mp4"></video>
       </div>
     </section>
@@ -259,8 +277,8 @@
       <div class="soft-launch-card glass" data-reveal>
         <div class="soft-launch-icon">💌</div>
         <p class="tiny">A MESSAGE I ALMOST DIDN'T SEND</p>
-        <h2>I have one question I couldn't fit into the friendship audit.</h2>
-        <p>Click this before the final question. I promise the message is more embarrassing for me than it is for you. 😂</p>
+        <h2>I have one question I couldn't fit into this birthday journey.</h2>
+        <p>There is one message here. You should probably open it before the final question. 😂</p>
         <button class="primary-btn" id="openSoftLaunch" type="button">Open my suspicious message →</button>
       </div>
     </section>
@@ -275,7 +293,7 @@
         <form id="replyForm" class="reply-form" method="POST" target="replySubmitFrame" enctype="multipart/form-data" novalidate>
           <div class="form-row"><label for="replyName">Your name / nickname <span>(required)</span></label><input id="replyName" name="name" type="text" maxlength="60" placeholder="Whatever I should call you 😌" required></div>
           <div class="form-row"><label for="webExperience">Did you like the website? 💻❤️</label><select id="webExperience" name="website_experience" required><option value="" selected disabled>Choose one…</option><option>Loved it ❤️</option><option>It was really sweet 🥹</option><option>Pretty good 😌</option><option>It needs work 😂</option><option>I have complaints. Lots of them. 😭</option></select></div>
-          <div class="form-row"><label for="softAnswer">And… about that boyfriend application? 👀</label><select id="softAnswer" name="soft_launch_response" required><option value="" selected disabled>Choose the honest answer…</option><option>Yes — application accepted. ❤️</option><option>Maybe… let me think. 😭</option><option>I like the idea, but I need time. 😌</option><option>You're staying in the friend department. 😂</option><option>I would like to discuss this properly.</option></select></div>
+          <div class="form-row"><label for="softAnswer">And… about that boyfriend question? 👀</label><select id="softAnswer" name="soft_launch_response" required><option value="" selected disabled>Choose the honest answer…</option><option>Yes — let's give this a chance. ❤️</option><option>Maybe… let me think. 😭</option><option>I like the idea, but I need time. 😌</option><option>You're staying in the friend department. 😂</option><option>I would like to discuss this properly.</option></select></div>
           <div class="form-row"><label for="extraMessage">Tell me your thoughts</label><textarea id="extraMessage" name="message" maxlength="1200" rows="6" placeholder="Your honest review, roasting, compliments, threats, thoughts… anything. 😂❤️"></textarea><div class="char-count"><span id="charCount">0</span>/1200</div></div>
           <div class="voice-note-field" id="voiceNoteField">
             <div class="voice-note-head">
@@ -309,6 +327,8 @@
           <input type="hidden" name="quiz_answers" id="quizAnswersHidden" value="">
           <input type="hidden" name="_subject" value="Shejal replied to the birthday surprise 💌">
           <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="https://pcmohit.github.io/shejal-birthday/thanks.html">
+          <input type="hidden" name="_url" value="https://pcmohit.github.io/shejal-birthday/">
           <input type="text" name="_honey" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true">
           <div class="reply-consent">Your reply is sent through the form service configured in <code>config.js</code>. Please don't enter passwords or other sensitive information.</div>
           <button class="primary-btn reply-submit" id="replySubmit" type="submit">Send my reply 💌</button>
@@ -325,8 +345,8 @@
         <h2>Be honest...</h2>
         <p>Did you like your birthday surprise?</p>
         <div class="choice-area">
-          <button class="yes-btn" id="yesBtn">YES ❤️</button>
-          <button class="no-btn" id="noBtn">NO 😐</button>
+          <button class="yes-btn" id="yesBtn" type="button">YES ❤️</button>
+          <button class="no-btn" id="noBtn" type="button">NO 😐</button>
         </div>
         <p id="noText" class="no-text"></p>
       </div>
@@ -339,15 +359,18 @@
         <div class="cake">🎂</div>
         <p class="tiny">27 · 09 · 2004 → 2026</p>
         <h1>Happy Birthday,<br><span>Shejal!</span></h1>
-        <img src="assets/photo-11.webp" alt="Shejal" class="final-photo" loading="lazy" decoding="async" data-caption="The final exhibit. Happy Birthday, Shejal! ❤️">
+        <img src="assets/photo-11.webp" alt="Shejal" class="final-photo" loading="lazy" decoding="async" data-caption="The final memory. Happy Birthday, Shejal! ❤️">
         <p class="final-line">You're not just a friend for one chapter of my life. You're one of those rare people I hope somehow remains in every chapter that comes after it. ❤️</p>
         <p class="tiny">Now go enjoy your day before I start getting emotional again. 😂</p>
+        <div class="celebration-actions">
+          <button class="ghost-btn replay-btn" id="replayJourney" type="button">↺ Replay the whole journey</button>
+        </div>
         <div class="made">Made with ❤️ by Mohit.</div>
       </div>
     </section>
   </main>
 
   <script src="config.js"></script>
-  <script src="script.js?v=20260927-voice-required-v2"></script>
+  <script src="script.js?v=20260927-final-polish-v3"></script>
 </body>
 </html>

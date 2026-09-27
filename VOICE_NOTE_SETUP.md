@@ -16,3 +16,7 @@ The website records a voice note in the browser and attaches it to the reply for
 - Maximum recording time is 4 minutes.
 - The page targets voice-note files below 15 MB.
 - FormSubmit's current documented limit is **10 MB total across all uploaded files in one form submission**. That server-side limit cannot be increased from the website code alone.
+
+
+## Submission confirmation
+The form uses FormSubmit's multipart upload flow and redirects successful submissions to `thanks.html`. The parent page listens for the same-origin success message so it does not treat an arbitrary cross-origin iframe load as a successful submission.

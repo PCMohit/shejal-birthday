@@ -76,3 +76,36 @@ body.lightbox-active{overflow:hidden}
 }
 .voice-preview-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%}.voice-play-btn{padding:10px 14px;font-size:11px}.voice-play-btn:disabled{opacity:.55;cursor:not-allowed}.voice-preview-head span{font-size:10px;color:var(--muted);line-height:1.5}
 @media (max-width:640px){.voice-preview-head{align-items:stretch}.voice-play-btn{width:100%}.voice-preview-head span{width:100%}}
+
+
+/* ===== FINAL POLISH ===== */
+/* Accessible keyboard focus without changing the visual identity. */
+:where(button,[role="button"],input,select,textarea,a):focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+
+/* Mobile journey indicator: show the whole sequence instead of hiding later chapters. */
+@media (max-width:640px){
+  .journey-bar{grid-template-columns:auto minmax(96px,1fr) auto}
+  .journey-dots{gap:4px;min-width:0;overflow:hidden}
+  .journey-dots button{flex:0 0 5px;width:5px;height:5px}
+  .journey-dots button[aria-current=true]{flex-basis:17px;width:17px}
+  .journey-dots button:nth-child(n+7){display:block}
+  .journey-brand,.journey-counter{font-size:8px}
+}
+
+/* One calm, manual entry into the private note. */
+.soft-launch-card .primary-btn{position:relative;overflow:hidden}
+.soft-launch-card .primary-btn:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.22),transparent 78%);transform:translateX(-120%);animation:buttonSheen 4.8s ease-in-out infinite}
+@keyframes buttonSheen{55%,100%{transform:translateX(120%)}}
+
+/* Replay action at the end of the journey. */
+.celebration-actions{margin:20px 0 6px;display:flex;justify-content:center}
+.replay-btn{border-color:rgba(242,169,201,.32);background:rgba(255,255,255,.04)}
+.replay-btn:hover{transform:translateY(-2px);border-color:rgba(242,169,201,.48);background:rgba(242,169,201,.08)}
+@media (max-width:640px){.celebration-actions{margin-top:18px}.replay-btn{width:100%;justify-content:center}}
+
+@media (prefers-reduced-motion:reduce){.soft-launch-card .primary-btn:after{animation:none}}
+
+
+/* The final photo is the only part of the celebration screen that opens the memory viewer. */
+.celebration-content{cursor:default}
+.final-photo{cursor:zoom-in}
