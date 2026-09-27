@@ -530,23 +530,31 @@ function launchConfetti(){
  });
  clearBtn?.addEventListener('click',()=>{clearVoice();recordBtn?.focus();});
 
- // Direct AJAX submission: keep Shejal on this page, disable FormSubmit's visible
- // reCAPTCHA for this personal form, and send the recorded audio as multipart FormData.
- // FormSubmit documents cross-origin AJAX submissions; the FormData payload preserves
- // the recorded voice file instead of dropping it like JSON serialization would.
- const buildAjaxEndpoint=()=>{
-   try{
-     const u=new URL(SITE_CONFIG.replyEndpoint);
-     if(u.hostname==='formsubmit.co'){
-       const parts=u.pathname.replace(/^\/+/, '').split('/').filter(Boolean);
-       if(parts[0]==='ajax') return u.toString();
-       u.pathname='/ajax/'+parts.join('/');
-       return u.toString();
-     }
-   }catch(_){/* fall through */}
-   return SITE_CONFIG.replyEndpoint;
+ // Native multipart submission through a hidden iframe. FormSubmit documents native
+ // multipart/form-data as the supported path for file uploads. We intentionally do NOT use
+ // the /ajax endpoint here: that endpoint's documented examples are JSON field submissions,
+ // while the voice note must travel as a real multipart file attachment.
+ const nativeEndpoint=SITE_CONFIG.replyEndpoint;
+ let submitFrame=null;
+ let frameSequence=0;
+
+ const ensureSubmitFrame=()=>{
+   if(submitFrame && submitFrame.isConnected)return submitFrame;
+   submitFrame=document.createElement('iframe');
+   submitFrame.name=`replySubmitFrame_${Date.now()}_${frameSequence++}`;
+   submitFrame.title='';
+   submitFrame.setAttribute('aria-hidden','true');
+   submitFrame.style.position='fixed';
+   submitFrame.style.width='1px';
+   submitFrame.style.height='1px';
+   submitFrame.style.border='0';
+   submitFrame.style.opacity='0';
+   submitFrame.style.pointerEvents='none';
+   submitFrame.style.left='-10000px';
+   submitFrame.style.top='-10000px';
+   document.body.appendChild(submitFrame);
+   return submitFrame;
  };
- const ajaxEndpoint=buildAjaxEndpoint();
 
  const setSubmitState=(busy,label='Sending…')=>{
    if(!submit)return;
@@ -554,11 +562,14 @@ function launchConfetti(){
    submit.textContent=busy?label:'Send my reply 💌';
  };
 
- form.addEventListener('submit',async e=>{
+ form.addEventListener('submit',e=>{
    e.preventDefault();
-   if(!SITE_CONFIG.replyEndpoint){status.textContent='Reply service is not configured yet. Replace the endpoint in config.js.';status.className='reply-status error';return;}
+   if(!nativeEndpoint){
+     status.textContent='Reply service is not configured yet. Replace the endpoint in config.js.';
+     status.className='reply-status error';
+     return;
+   }
 
-   // Use the browser's constraint validation UI first, including the required voice field.
    if(!form.checkValidity()){
      form.reportValidity();
      const invalid=form.querySelector(':invalid');
@@ -581,6 +592,7 @@ function launchConfetti(){
      status.className='reply-status error';
      return;
    }
+
    const voiceFile=fileInput?.files?.[0];
    if(!voiceFile){
      setVoiceStatus('Please record a voice note first. ❤️','error');
@@ -589,62 +601,81 @@ function launchConfetti(){
      status.className='reply-status error';
      return;
    }
+
+   // FormSubmit's documented server-side upload limit is 10 MB total per submission.
+   // Keep the UI's 15 MB recording ceiling, but prevent a submission the service will reject.
    if(voiceFile.size>10*1024*1024){
-     setVoiceStatus(`This voice note is ${Math.round(voiceFile.size/1024/1024*10)/10} MB. FormSubmit allows up to 10 MB per submission, so please record a shorter/lower-size note.`,'error');
+     setVoiceStatus(`This voice note is ${Math.round(voiceFile.size/1024/1024*10)/10} MB. The form service allows up to 10 MB per submission, so please record a shorter note.`,'error');
      status.textContent='The voice note is too large for the form service. ❤️';
      status.className='reply-status error';
      return;
    }
+
+   const frame=ensureSubmitFrame();
+   const previousAction=form.getAttribute('action');
+   const previousTarget=form.getAttribute('target');
+   const previousNext=form.querySelector('input[name="_next"]');
+   const previousUrl=form.querySelector('input[name="_url"]');
 
    setSubmitState(true,'Sending…');
    status.textContent='Sending your reply and voice note… ❤️';
    status.className='reply-status';
    setVoiceStatus(`Voice note attached · ${Math.max(1,Math.round(voiceFile.size/1024))} KB · sending now.`,'success');
 
-   try{
-     const data=new FormData(form);
-     data.delete('_next');
-     data.delete('_url');
-     data.set('_captcha','false');
-
-     const response=await fetch(ajaxEndpoint,{
-       method:'POST',
-       body:data,
-       headers:{'Accept':'application/json'}
-     });
-
-     let result=null;
-     try{result=await response.json();}catch(_){result=null;}
-
-     if(!response.ok || (result && result.success===false)){
-       const message=result?.message || `Submission failed (${response.status}). Please try again.`;
-       throw new Error(message);
-     }
-
-     // Keep the experience on this page: briefly replace the send button with a
-     // confirmation label, then return it to its original state. No redirect,
-     // popup, new tab, or external thank-you page.
+   let settled=false;
+   const finishSubmission=()=>{
+     if(settled)return;
+     settled=true;
+     frame.removeEventListener('load',onLoad);
+     form.removeAttribute('target');
+     if(previousTarget!==null)form.setAttribute('target',previousTarget);
+     if(previousAction!==null)form.setAttribute('action',previousAction); else form.removeAttribute('action');
+     if(previousNext)previousNext.disabled=false;
+     if(previousUrl)previousUrl.disabled=false;
      status.textContent='';
      status.className='reply-status';
      setVoiceStatus('','');
      if(submit){
-       const originalText='Send my reply 💌';
        submit.disabled=true;
        submit.textContent='Submitted ✓';
        submit.classList.add('submitted');
        window.setTimeout(()=>{
          submit.disabled=false;
-         submit.textContent=originalText;
+         submit.textContent='Send my reply 💌';
          submit.classList.remove('submitted');
        },1000);
      }
+   };
+
+   // There is no same-origin response body to inspect from the hidden iframe. The load
+   // event confirms that the browser completed navigation of the submission target; after
+   // that, FormSubmit owns the delivery. A fallback prevents the UI from staying stuck if
+   // a browser does not emit a load event for the cross-origin response.
+   const fallbackId=window.setTimeout(finishSubmission,7000);
+   const onLoad=()=>{window.clearTimeout(fallbackId);finishSubmission();};
+   frame.addEventListener('load',onLoad,{once:false});
+
+   form.setAttribute('action',nativeEndpoint);
+   form.setAttribute('target',frame.name);
+   // These fields are not needed for hidden-frame submission. Keeping them disabled prevents
+   // accidental redirects/URL metadata from changing the user's experience.
+   previousNext?.setAttribute('disabled','disabled');
+   previousUrl?.setAttribute('disabled','disabled');
+   try{
+     HTMLFormElement.prototype.submit.call(form);
    }catch(err){
+     window.clearTimeout(fallbackId);
+     frame.removeEventListener('load',onLoad);
+     settled=true;
+     form.removeAttribute('target');
+     if(previousTarget!==null)form.setAttribute('target',previousTarget);
+     if(previousAction!==null)form.setAttribute('action',previousAction); else form.removeAttribute('action');
+     if(previousNext)previousNext.disabled=false;
+     if(previousUrl)previousUrl.disabled=false;
      setSubmitState(false);
-     status.textContent=err?.message?.includes('Failed to fetch')
-       ? 'I could not reach the reply service. Check your internet connection and try again. ❤️'
-       : (err?.message || 'Something went wrong while sending. Please try again.');
+     status.textContent='Something went wrong while sending. Please try again.';
      status.className='reply-status error';
-     setVoiceStatus('Your voice note is still saved here. Nothing was submitted. You can try sending again.','error');
+     setVoiceStatus('Your voice note is still saved here. Nothing was submitted.','error');
    }
  });
  window.addEventListener('beforeunload',stopTracks);

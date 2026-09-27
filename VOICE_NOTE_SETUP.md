@@ -18,8 +18,7 @@ The website records a voice note in the browser and attaches it to the reply for
 - FormSubmit's current documented limit is **10 MB total across all uploaded files in one form submission**. That server-side limit cannot be increased from the website code alone.
 
 ### Reply submission behavior
-The reply form uses the normal FormSubmit multipart POST in a same page so audio attachments are preserved reliably. The main birthday page stays open, and FormSubmit redirects the submission tab to `thanks.html` after processing.
+The reply form uses FormSubmit's native `multipart/form-data` POST inside a hidden iframe. This keeps the visitor on the same birthday page and preserves the voice note as a real attachment. No new tab or visible thank-you page is opened.
 
-
-### Direct submission
-The reply form submits with FormSubmit's AJAX endpoint so the visitor stays on the birthday page. The form sends the recorded voice note as multipart `FormData`, and `_captcha=false` is used to suppress the visible reCAPTCHA. FormSubmit documents cross-origin AJAX submissions and native multipart file uploads separately.
+### Why native POST is used
+FormSubmit documents file uploads with a normal `POST` form using `enctype="multipart/form-data"`, while its AJAX documentation shows JSON-based field submission. The site therefore uses native multipart submission for the voice note and the hidden iframe only to keep the user on the page.

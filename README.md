@@ -32,4 +32,4 @@ GitHub Pages serves static files, so it cannot itself store form submissions. Th
 - The final celebration photo and text are explicitly centered for consistent alignment across desktop and mobile.
 
 ### Reply submission behavior
-The reply form uses the normal FormSubmit multipart POST in a same page so audio attachments are preserved reliably. The main birthday page stays open, and FormSubmit redirects the submission tab to `thanks.html` after processing. The recipient endpoint in `config.js` is preconfigured with the activated address shown in the current setup.
+The reply form uses FormSubmit's native `multipart/form-data` POST with a hidden iframe. This keeps the visitor on the birthday page while preserving the recorded voice note as a real file attachment. No new tab or visible thank-you page is used.

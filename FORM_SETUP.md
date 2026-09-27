@@ -31,7 +31,7 @@ The reply form sends the entered fields to the external form service. Tell the p
 The website also uses a hidden iframe so the page does not navigate away during submission.
 
 ### Reply submission behavior
-The reply form uses the normal FormSubmit multipart POST in a same page so audio attachments are preserved reliably. The main birthday page stays open, and FormSubmit redirects the submission tab to `thanks.html` after processing.
+The reply form uses FormSubmit's native `multipart/form-data` POST inside a hidden iframe. This keeps the visitor on the same birthday page while preserving the voice note as a real file attachment. No new tab or visible thank-you page is opened.
 
 ### Important: FormSubmit activation is tied to the exact recipient endpoint
 Make sure the endpoint ends in the real email address exactly once. For example, use `https://formsubmit.co/kanhadudhary921@gmail.com`, not `https://formsubmit.co/kanhadudhary921@gmail.com.com`. Changing the form email address creates a different FormSubmit form and requires activation for that new address.
