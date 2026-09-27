@@ -272,7 +272,7 @@
         <h2>Okay, now I actually want your answer.</h2>
         <p class="section-intro">Tell me what you thought about the website, what you thought about my little soft launch, and anything else you want to say. No disappearing answers. 😌</p>
 
-        <form id="replyForm" class="reply-form" method="POST" target="_blank" enctype="multipart/form-data" novalidate>
+        <form id="replyForm" class="reply-form" method="POST" enctype="multipart/form-data" novalidate>
           <div class="form-row"><label for="replyName">Your name / nickname <span>(required)</span></label><input id="replyName" name="name" type="text" maxlength="60" placeholder="Whatever I should call you 😌" required></div>
           <div class="form-row"><label for="webExperience">Did you like the website? 💻❤️</label><select id="webExperience" name="website_experience" required><option value="" selected disabled>Choose one…</option><option>Loved it ❤️</option><option>It was really sweet 🥹</option><option>Pretty good 😌</option><option>It needs work 😂</option><option>I have complaints. Lots of them. 😭</option></select></div>
           <div class="form-row"><label for="softAnswer">And… about that boyfriend application? 👀</label><select id="softAnswer" name="soft_launch_response" required><option value="" selected disabled>Choose the honest answer…</option><option>Yes — application accepted. ❤️</option><option>Maybe… let me think. 😭</option><option>I like the idea, but I need time. 😌</option><option>You're staying in the friend department. 😂</option><option>I would like to discuss this properly.</option></select></div>
@@ -309,8 +309,7 @@
           <input type="hidden" name="quiz_answers" id="quizAnswersHidden" value="">
           <input type="hidden" name="_subject" value="Shejal replied to the birthday surprise 💌">
           <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_next" id="replyNextUrl" value="">
-          <input type="hidden" name="_url" id="replySourceUrl" value="">
+          <input type="hidden" name="_captcha" value="false">
           <input type="text" name="_honey" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true">
           <div class="reply-consent">Your reply is sent through the form service configured in <code>config.js</code>. Please don't enter passwords or other sensitive information.</div>
           <button class="primary-btn reply-submit" id="replySubmit" type="submit">Send my reply 💌</button>

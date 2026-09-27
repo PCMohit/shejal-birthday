@@ -530,66 +530,112 @@ function launchConfetti(){
  });
  clearBtn?.addEventListener('click',()=>{clearVoice();recordBtn?.focus();});
 
- // Native multipart/form-data submission is deliberate here: FormSubmit documents file
- // uploads on the normal form endpoint, while its AJAX endpoint is documented separately.
- // Sending the form to a new tab avoids the hidden-iframe hang and lets the recipient see
- // FormSubmit's own confirmation/activation page.
- const nextUrl=$('#replyNextUrl'),sourceUrl=$('#replySourceUrl');
- const prepareReplyDestination=()=>{
-   if(nextUrl){
-     const u=new URL('thanks.html',window.location.href);
-     u.searchParams.set('reply','sent');
-     nextUrl.value=u.href;
-   }
-   if(sourceUrl)sourceUrl.value=window.location.href.split('#')[0];
+ // Direct AJAX submission: keep Shejal on this page, disable FormSubmit's visible
+ // reCAPTCHA for this personal form, and send the recorded audio as multipart FormData.
+ // FormSubmit documents cross-origin AJAX submissions; the FormData payload preserves
+ // the recorded voice file instead of dropping it like JSON serialization would.
+ const buildAjaxEndpoint=()=>{
+   try{
+     const u=new URL(SITE_CONFIG.replyEndpoint);
+     if(u.hostname==='formsubmit.co'){
+       const parts=u.pathname.replace(/^\/+/, '').split('/').filter(Boolean);
+       if(parts[0]==='ajax') return u.toString();
+       u.pathname='/ajax/'+parts.join('/');
+       return u.toString();
+     }
+   }catch(_){/* fall through */}
+   return SITE_CONFIG.replyEndpoint;
  };
- form.addEventListener('submit',e=>{
-   if(!SITE_CONFIG.replyEndpoint){e.preventDefault();status.textContent='Reply service is not configured yet. Replace the endpoint in config.js with your FormSubmit URL.';status.className='reply-status error';return;}
-   const required=[...form.querySelectorAll('[required]')];
-   const missing=required.find(el=>!el.value);
-   if(missing){
-     e.preventDefault();
-     if(missing===fileInput){
+ const ajaxEndpoint=buildAjaxEndpoint();
+
+ const setSubmitState=(busy,label='Sending…')=>{
+   if(!submit)return;
+   submit.disabled=busy;
+   submit.textContent=busy?label:'Send my reply 💌';
+ };
+
+ form.addEventListener('submit',async e=>{
+   e.preventDefault();
+   if(!SITE_CONFIG.replyEndpoint){status.textContent='Reply service is not configured yet. Replace the endpoint in config.js.';status.className='reply-status error';return;}
+
+   // Use the browser's constraint validation UI first, including the required voice field.
+   if(!form.checkValidity()){
+     form.reportValidity();
+     const invalid=form.querySelector(':invalid');
+     if(invalid===fileInput){
        setVoiceStatus('Please record your voice note before sending. ❤️','error');
        stateEl?.scrollIntoView({behavior:'smooth',block:'center'});
        recordBtn?.focus();
-       status.textContent='Your voice note is required before sending. ❤️';
-     }else{
-       missing.focus();
-       status.textContent='Please complete all required fields before sending. ❤️';
      }
+     status.textContent='Please complete all required fields before sending. ❤️';
      status.className='reply-status error';
      return;
    }
-   if(form.querySelector('input[name="_honey"]')?.value){e.preventDefault();return;}
+   if(form.querySelector('input[name="_honey"]')?.value)return;
    syncQuizMeta();
+
    if(recorder && recorder.state==='recording'){
-     e.preventDefault();
      setVoiceStatus('Stop the recording before sending so I can attach the full voice note.','error');
      recordBtn?.focus();
+     status.textContent='Stop your recording before sending. ❤️';
+     status.className='reply-status error';
      return;
    }
-   if(!fileInput?.files?.length){
-     e.preventDefault();
-     setVoiceStatus('Please record a voice note first.','error');
+   const voiceFile=fileInput?.files?.[0];
+   if(!voiceFile){
+     setVoiceStatus('Please record a voice note first. ❤️','error');
      recordBtn?.focus();
      status.textContent='Your voice note is required before sending. ❤️';
      status.className='reply-status error';
      return;
    }
+   if(voiceFile.size>10*1024*1024){
+     setVoiceStatus(`This voice note is ${Math.round(voiceFile.size/1024/1024*10)/10} MB. FormSubmit allows up to 10 MB per submission, so please record a shorter/lower-size note.`,'error');
+     status.textContent='The voice note is too large for the form service. ❤️';
+     status.className='reply-status error';
+     return;
+   }
 
-   prepareReplyDestination();
-   // Let the browser perform the real multipart form POST. This is important for
-   // the audio attachment; do not replace it with fetch/AJAX.
-   submit.disabled=true;
-   submit.textContent='Opening submission…';
-   status.textContent='Your reply is opening in a new tab. Please complete the FormSubmit confirmation there. ❤️';
+   setSubmitState(true,'Sending…');
+   status.textContent='Sending your reply and voice note… ❤️';
    status.className='reply-status';
-   setVoiceStatus(`Voice note attached and ready to send · ${Math.max(1,Math.round(fileInput.files[0].size/1024))} KB`,'success');
-   window.setTimeout(()=>{
-     submit.disabled=false;
-     submit.textContent='Send my reply 💌';
-   },2500);
+   setVoiceStatus(`Voice note attached · ${Math.max(1,Math.round(voiceFile.size/1024))} KB · sending now.`,'success');
+
+   try{
+     const data=new FormData(form);
+     data.delete('_next');
+     data.delete('_url');
+     data.set('_captcha','false');
+
+     const response=await fetch(ajaxEndpoint,{
+       method:'POST',
+       body:data,
+       headers:{'Accept':'application/json'}
+     });
+
+     let result=null;
+     try{result=await response.json();}catch(_){result=null;}
+
+     if(!response.ok || (result && result.success===false)){
+       const message=result?.message || `Submission failed (${response.status}). Please try again.`;
+       throw new Error(message);
+     }
+
+     status.textContent='Sent successfully. Your reply and voice note reached me. ❤️';
+     status.className='reply-status success';
+     setVoiceStatus('Voice note sent successfully with your reply. ❤️','success');
+     setSubmitState(true,'Reply sent ✓');
+     form.querySelectorAll('input,select,textarea,button').forEach(el=>{
+       if(el!==submit)el.disabled=true;
+     });
+   }catch(err){
+     setSubmitState(false);
+     status.textContent=err?.message?.includes('Failed to fetch')
+       ? 'I could not reach the reply service. Check your internet connection and try again. ❤️'
+       : (err?.message || 'Something went wrong while sending. Please try again.');
+     status.className='reply-status error';
+     setVoiceStatus('Your voice note is still saved here. Nothing was submitted. You can try sending again.','error');
+   }
  });
  window.addEventListener('beforeunload',stopTracks);
 })();
