@@ -30,3 +30,6 @@ GitHub Pages serves static files, so it cannot itself store form submissions. Th
 - Name / nickname is required before submitting the reply.
 - The free-text field is labeled “Tell me your thoughts”.
 - The final celebration photo and text are explicitly centered for consistent alignment across desktop and mobile.
+
+### Reply submission behavior
+The reply form uses the normal FormSubmit multipart POST in a new tab so audio attachments are preserved reliably. The main birthday page stays open, and FormSubmit redirects the submission tab to `thanks.html` after processing.

@@ -10,7 +10,7 @@ $$('[data-scroll]').forEach(btn=>btn.addEventListener('click',()=>$(btn.dataset.
 /* ===== QUIZ ===== */
 const questions=[
  {q:"Be honest… who is the bigger headache in this friendship? 😂",a:["Obviously Mohit","Obviously Shejal","Both are equally problematic","This question is unfair 😭"],correct:3,ok:"Correct. The question WAS unfair. 😌"},
- {q:"How many times have you promised me “I'll send you the pictures later”? 😂",a:["2–3 times","10+ times","I don't remember 😌","Nice try. I'm not exposing myself."],correct:1,ok:"The memory says 10+. I’ll give you that one. 💀"},
+ {q:"How many times have you promised me “I'll send you the pictures later”? 😂",a:["2–3 times","10+ times","I don't remember 😌","Nice try. I'm not exposing myself."],correct:1,ok:"The evidence says 10+. The defence rests. 💀"},
  {q:"If I ask you AGAIN to meet, what are you most likely to say? 😂",a:["Yes, finally!","I'll see…","I'm busy.","Ask my parents first. 💀"],correct:1,ok:"Exactly. “I'll see…” — the national anthem of this friendship. 😂"},
  {q:"Who usually starts the conversation? 👀",a:["Shejal","Mohit","Whoever remembers the other person exists 😂","Nobody. We communicate telepathically."],correct:1,ok:"Correct. I have accepted my destiny. 😭"},
  {q:"What was Mohit thinking after the legendary “Namaste Didi” incident? 😂",a:["Harami, bas bezzati karati haii 😭","Mere yaha aane se pehle bhi bata sakti thi ye 😭","Why are they laughing at me?","All of the above"],correct:1,ok:"YES. THAT EXACT THOUGHT. 😂"}
@@ -92,9 +92,12 @@ $('#secretBtn')?.addEventListener('click',()=>{
  yes?.addEventListener('click',()=>{close(); reply?.scrollIntoView({behavior:'smooth'}); window.setTimeout(()=>$('#softAnswer')?.focus(),500);});
  later?.addEventListener('click',()=>{close(); reply?.scrollIntoView({behavior:'smooth'}); window.setTimeout(()=>{const sel=$('#softAnswer'); if(sel){sel.focus();sel.value='Maybe… let me think. 😭';}},500);});
  addEventListener('keydown',e=>{if(e.key==='Escape'&&modal?.classList.contains('open')) close();});
- // The message opens only when she chooses it; scrolling should never interrupt the journey.
+ // Open once when the dedicated section becomes relevant.
  const section=$('#soft-launch');
- if(section) section.dataset.modalMode='manual';
+ if(section && 'IntersectionObserver' in window){
+   const io=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){io.disconnect();window.setTimeout(open,650);}}, {threshold:.45});
+   io.observe(section);
+ }
 })();
 
 /* ===== HONEST FINAL QUESTION ===== */
@@ -175,7 +178,7 @@ function launchConfetti(){
  const loader=$('#pageLoader'),progress=$('#readingProgress'),backTop=$('#backTop'),toast=$('#toast');
  const lightbox=$('#lightbox'),lightboxImage=$('#lightboxImage'),lightboxTitle=$('#lightboxTitle'),lightboxText=$('#lightboxText'),lightboxIndex=$('#lightboxIndex');
  const close=$('#lightboxClose'),prev=$('#lightboxPrev'),next=$('#lightboxNext');
- let gallery=[],current=0,toastTimer=0,returnFocus=null;
+ let gallery=[],current=0,toastTimer=0;
 
  addEventListener('load',()=>window.setTimeout(()=>loader?.classList.add('hidden'),180),{once:true});
  let scrollTick=false;
@@ -200,47 +203,32 @@ function launchConfetti(){
  /* ----- Gallery / memory viewer ----- */
  const imageNodes=[...document.querySelectorAll('.photo-card img,.place-card img,.final-photo')];
  gallery=imageNodes.map((img,index)=>{
-   const card=img.closest('.photo-card,.place-card');
+   const card=img.closest('.photo-card,.place-card,.celebration-content');
    const title=card?.querySelector('figcaption b')?.textContent?.trim()
      ||(img.closest('.place-card')?'Favourite place':'Shejal');
    const text=card?.querySelector('figcaption span')?.textContent?.trim()
      ||img.dataset.caption||img.alt||'';
    const src=img.getAttribute('src')||img.currentSrc||'';
    img.dataset.memoryIndex=String(index);
-
-   // One keyboard target per memory. The image itself is the target only for the final photo,
-   // while gallery/place cards act as the target for their contained image.
-   if(card){
-     card.dataset.memoryIndex=String(index);
-     card.setAttribute('tabindex','0');
-     card.setAttribute('role','button');
-     card.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
-   }else if(img.classList.contains('final-photo')){
-     img.setAttribute('tabindex','0');
-     img.setAttribute('role','button');
-     img.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
+   img.setAttribute('tabindex','0');
+   img.setAttribute('role','button');
+   img.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
+   const owner=img.closest('.photo-card,.place-card,.celebration-content');
+   if(owner){
+     owner.dataset.memoryIndex=String(index);
+     owner.setAttribute('tabindex','0');
+     owner.setAttribute('role','button');
+     owner.setAttribute('aria-label','Open photo: '+(img.alt||'Shejal'));
    }
    return {img,src,alt:img.alt||'Shejal',title,text};
  });
 
  const setViewerOpen=(open)=>{
    if(!lightbox) return;
-   if(open){
-     if(!lightbox.classList.contains('open')) returnFocus=document.activeElement;
-     lightbox.classList.add('open');
-     lightbox.setAttribute('aria-hidden','false');
-     document.body.classList.add('lightbox-active');
-     document.body.style.overflow='hidden';
-     window.setTimeout(()=>close?.focus(),40);
-   }else{
-     lightbox.classList.remove('open');
-     lightbox.setAttribute('aria-hidden','true');
-     document.body.classList.remove('lightbox-active');
-     document.body.style.overflow='';
-     const focusTarget=returnFocus;
-     returnFocus=null;
-     if(focusTarget?.isConnected) window.setTimeout(()=>focusTarget.focus(),0);
-   }
+   lightbox.classList.toggle('open',open);
+   lightbox.setAttribute('aria-hidden',open?'false':'true');
+   document.body.classList.toggle('lightbox-active',open);
+   document.body.style.overflow=open?'hidden':'';
  };
 
  function preload(index){
@@ -261,7 +249,7 @@ function launchConfetti(){
    lightboxImage.src=item.src;
    if(lightboxTitle) lightboxTitle.textContent=item.title;
    if(lightboxText) lightboxText.textContent=item.text;
-   if(lightboxIndex) lightboxIndex.textContent=`Memory ${String(current+1).padStart(2,'0')} · from the camera roll`;
+   if(lightboxIndex) lightboxIndex.textContent=`Photo ${current+1} of ${gallery.length}`;
    if(prev) prev.disabled=gallery.length<2;
    if(next) next.disabled=gallery.length<2;
    setViewerOpen(true);
@@ -286,12 +274,11 @@ function launchConfetti(){
     resolve to the same photo. This avoids fragile per-element hit-testing on transformed cards. */
  const openFromTarget=(target)=>{
    if(!(target instanceof Element)) return false;
-   // Do not hijack buttons, form controls, media controls, links, or other interactive elements.
-   if(target.closest('button,a,input,select,textarea,video,audio')) return false;
-   const owner=target.closest('.photo-card,.place-card');
-   const candidate=owner?.querySelector('img[data-memory-index]') || target.closest('.final-photo');
-   if(!candidate) return false;
-   const idx=Number(candidate.dataset.memoryIndex);
+   const owner=target.closest('.photo-card,.place-card,.celebration-content');
+   if(!owner) return false;
+   const img=owner.querySelector('img[data-memory-index]');
+   if(!img) return false;
+   const idx=Number(img.dataset.memoryIndex);
    if(Number.isNaN(idx)) return false;
    show(idx);
    return true;
@@ -304,21 +291,14 @@ function launchConfetti(){
 
  document.addEventListener('keydown',(e)=>{
    if(lightbox?.classList.contains('open')){
-     if(e.key==='Escape'){e.preventDefault();hide();return;}
-     if(e.key==='ArrowLeft'){e.preventDefault();show(current-1);return;}
-     if(e.key==='ArrowRight'){e.preventDefault();show(current+1);return;}
-     if(e.key==='Tab'){
-       const focusables=[close,prev,next].filter(el=>el && !el.disabled && !el.hidden);
-       if(!focusables.length)return;
-       const first=focusables[0],last=focusables[focusables.length-1];
-       if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();}
-       else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();}
-     }
+     if(e.key==='Escape'){e.preventDefault();hide();}
+     else if(e.key==='ArrowLeft'){e.preventDefault();show(current-1);}
+     else if(e.key==='ArrowRight'){e.preventDefault();show(current+1);}
      return;
    }
    if(e.key==='Enter'||e.key===' '){
      const active=document.activeElement;
-     if(active?.matches('.photo-card,.place-card,.final-photo')){
+     if(active?.matches('.photo-card,.place-card,.celebration-content')){
        e.preventDefault();
        openFromTarget(active);
      }
@@ -550,36 +530,19 @@ function launchConfetti(){
  });
  clearBtn?.addEventListener('click',()=>{clearVoice();recordBtn?.focus();});
 
- // Native multipart submission keeps the recorded voice note as a real attachment.
- // FormSubmit redirects successful submissions to our same-origin thanks.html page, which
- // lets the parent page confirm success instead of treating any iframe load as success.
- const iframe=$('#replySubmitFrame');
- const THANKS_URL='https://pcmohit.github.io/shejal-birthday/thanks.html';
- let submissionPending=false,submissionTimer=null;
- const completeSubmission=()=>{
-   if(!submissionPending)return;
-   submissionPending=false;
-   if(submissionTimer)clearTimeout(submissionTimer);
-   status.textContent='Your reply and voice note were sent successfully. ❤️';
-   status.className='reply-status success';
-   submit.disabled=false;
-   submit.textContent='Send my reply 💌';
-   clearVoice();
-   form.reset();
-   updateCount();
-   syncQuizMeta();
- };
- window.addEventListener('message',e=>{
-   if(e.origin===location.origin && e.data?.type==='shejal-form-success') completeSubmission();
- });
- iframe?.addEventListener('load',()=>{
-   if(!submissionPending)return;
-   try{
-     if(iframe.contentWindow?.location?.href?.startsWith(THANKS_URL)) completeSubmission();
-   }catch(_){
-     // The FormSubmit response is cross-origin until the successful redirect; wait for thanks.html.
+ // Native multipart/form-data submission is deliberate here: FormSubmit documents file
+ // uploads on the normal form endpoint, while its AJAX endpoint is documented separately.
+ // Sending the form to a new tab avoids the hidden-iframe hang and lets the recipient see
+ // FormSubmit's own confirmation/activation page.
+ const nextUrl=$('#replyNextUrl'),sourceUrl=$('#replySourceUrl');
+ const prepareReplyDestination=()=>{
+   if(nextUrl){
+     const u=new URL('thanks.html',window.location.href);
+     u.searchParams.set('reply','sent');
+     nextUrl.value=u.href;
    }
- });
+   if(sourceUrl)sourceUrl.value=window.location.href.split('#')[0];
+ };
  form.addEventListener('submit',e=>{
    if(!SITE_CONFIG.replyEndpoint){e.preventDefault();status.textContent='Reply service is not configured yet. Replace the endpoint in config.js with your FormSubmit URL.';status.className='reply-status error';return;}
    const required=[...form.querySelectorAll('[required]')];
@@ -614,38 +577,23 @@ function launchConfetti(){
      status.className='reply-status error';
      return;
    }
-   submissionPending=true;
-   submit.disabled=true;submit.textContent='Sending…';status.textContent='Sending your reply and voice note…';status.className='reply-status';
-   submissionTimer=window.setTimeout(()=>{
-     if(!submissionPending)return;
-     status.textContent='The form is taking longer than expected. Keep this tab open a little longer; if it never confirms, try sending again.';
-     status.className='reply-status';
+
+   prepareReplyDestination();
+   // Let the browser perform the real multipart form POST. This is important for
+   // the audio attachment; do not replace it with fetch/AJAX.
+   submit.disabled=true;
+   submit.textContent='Opening submission…';
+   status.textContent='Your reply is opening in a new tab. Please complete the FormSubmit confirmation there. ❤️';
+   status.className='reply-status';
+   setVoiceStatus(`Voice note attached and ready to send · ${Math.max(1,Math.round(fileInput.files[0].size/1024))} KB`,'success');
+   window.setTimeout(()=>{
      submit.disabled=false;
      submit.textContent='Send my reply 💌';
-     submissionPending=false;
-   },15000);
+   },2500);
  });
  window.addEventListener('beforeunload',stopTracks);
 })();
 
-
-/* ===== REPLAY JOURNEY ===== */
-(()=>{
- const replay=$('#replayJourney'),celebration=$('#celebration'),finale=$('#finale');
- replay?.addEventListener('click',()=>{
-   if(celebration)celebration.classList.remove('active');
-   if(finale)finale.style.display='';
-   // Reset the final playful button to its initial position.
-   if(noBtn){
-     noBtn.style.position='';noBtn.style.left='';noBtn.style.top='';noBtn.style.transform='';
-   }
-   noClicks=0;lastDodge=0;if(noText)noText.textContent='';
-   // Reset the memory check so the journey can genuinely be replayed.
-   qi=0;quizScore=0;quizAnswers.length=0;syncQuizMeta();renderQ();
-   document.querySelectorAll('[data-reveal]').forEach(el=>el.classList.add('revealed'));
-   document.getElementById('home')?.scrollIntoView({behavior:'smooth',block:'start'});
- });
-})();
 
 /* ===== BIRTHDAY JOURNEY NAV ===== */
 (()=>{

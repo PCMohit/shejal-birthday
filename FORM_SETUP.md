@@ -29,3 +29,6 @@ FormSubmit says the first submission triggers an email asking you to confirm the
 The reply form sends the entered fields to the external form service. Tell the person using the form not to enter passwords, OTPs, financial data, or other sensitive information.
 
 The website also uses a hidden iframe so the page does not navigate away during submission.
+
+### Reply submission behavior
+The reply form uses the normal FormSubmit multipart POST in a new tab so audio attachments are preserved reliably. The main birthday page stays open, and FormSubmit redirects the submission tab to `thanks.html` after processing.
