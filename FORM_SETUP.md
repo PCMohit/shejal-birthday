@@ -5,7 +5,7 @@
 You will see:
 
 ```js
-replyEndpoint: "https://formsubmit.co/YOUR_EMAIL@example.com"
+replyEndpoint: "https://formsubmit.co/kanhadudhary921@gmail.com"
 ```
 
 Replace `YOUR_EMAIL@example.com` with the email address where you want Shejal's replies to arrive.
@@ -13,7 +13,7 @@ Replace `YOUR_EMAIL@example.com` with the email address where you want Shejal's 
 Example:
 
 ```js
-replyEndpoint: "https://formsubmit.co/yourname@gmail.com"
+replyEndpoint: "https://formsubmit.co/kanhadudhary921@gmail.com"
 ```
 
 ## 2. Upload the whole folder to GitHub
@@ -32,3 +32,6 @@ The website also uses a hidden iframe so the page does not navigate away during 
 
 ### Reply submission behavior
 The reply form uses the normal FormSubmit multipart POST in a new tab so audio attachments are preserved reliably. The main birthday page stays open, and FormSubmit redirects the submission tab to `thanks.html` after processing.
+
+### Important: FormSubmit activation is tied to the exact recipient endpoint
+Make sure the endpoint ends in the real email address exactly once. For example, use `https://formsubmit.co/kanhadudhary921@gmail.com`, not `https://formsubmit.co/kanhadudhary921@gmail.com.com`. Changing the form email address creates a different FormSubmit form and requires activation for that new address.
